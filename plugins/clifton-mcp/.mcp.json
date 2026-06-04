@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "clifton": {
+      "type": "http",
+      "url": "https://ai.cliftonapi.com/v1/mcp"
+    }
+  }
+}

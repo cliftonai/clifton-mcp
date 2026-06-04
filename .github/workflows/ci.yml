@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    name: Validate manifests & docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON manifests
+        run: |
+          set -e
+          for f in \
+            .claude-plugin/marketplace.json \
+            plugins/clifton-mcp/.claude-plugin/plugin.json \
+            plugins/clifton-mcp/.mcp.json; do
+            echo "validating $f"
+            jq empty "$f"
+          done
+
+      - name: Check required files exist
+        run: |
+          set -e
+          for f in README.md INSTALL.md LICENSE CHANGELOG.md SECURITY.md SUPPORT.md TROUBLESHOOTING.md API.md; do
+            test -f "$f" || { echo "::error::missing required file: $f"; exit 1; }
+          done
+
+      - name: Plugin version is recorded in CHANGELOG
+        run: |
+          set -e
+          v=$(jq -r .version plugins/clifton-mcp/.claude-plugin/plugin.json)
+          echo "plugin version: $v"
+          grep -q "$v" CHANGELOG.md || { echo "::error::CHANGELOG.md does not mention version $v"; exit 1; }

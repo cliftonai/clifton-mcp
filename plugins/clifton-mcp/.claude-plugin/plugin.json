@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "clifton-mcp",
+  "displayName": "Clifton MCP",
+  "version": "0.1.0",
+  "description": "Source-linked financial research over MCP — SEC filings, transcripts, expectations, and market reactions.",
+  "author": {
+    "name": "Clifton Software, Inc.",
+    "email": "support@cliftonai.com",
+    "url": "https://www.cliftonai.com"
+  },
+  "homepage": "https://github.com/Clifton-Software-Inc/clifton-mcp",
+  "repository": "https://github.com/Clifton-Software-Inc/clifton-mcp",
+  "license": "MIT",
+  "keywords": ["mcp", "finance", "sec-filings", "earnings", "claude", "research"],
+  "mcpServers": "./.mcp.json"
+}

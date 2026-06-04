@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-marketplace.json",
+  "name": "clifton-mcp",
+  "description": "Clifton AI — source-linked financial research over MCP for Claude, Cursor, Codex, and agents.",
+  "owner": {
+    "name": "Clifton Software, Inc.",
+    "email": "support@cliftonai.com"
+  },
+  "plugins": [
+    {
+      "name": "clifton-mcp",
+      "displayName": "Clifton MCP",
+      "description": "Source-linked financial research: SEC filings, transcripts, expectations, and market reactions, callable from your agent.",
+      "source": "./plugins/clifton-mcp",
+      "homepage": "https://github.com/Clifton-Software-Inc/clifton-mcp",
+      "license": "MIT",
+      "keywords": ["mcp", "finance", "sec-filings", "earnings", "claude", "research"],
+      "category": "finance"
+    }
+  ]
+}
