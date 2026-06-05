@@ -9,3 +9,7 @@ We aim to acknowledge reports within **3 business days** and provide a fix or st
 ## Scope
 
 This repo holds public docs and a Claude Code plugin (config + a skill). The MCP service itself runs at `https://ai.cliftonapi.com/v1/mcp`.
+
+## Privacy & terms
+
+Privacy Policy: https://cliftonai.com/#/privacy · Terms of Service: https://cliftonai.com/#/terms

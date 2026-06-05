@@ -1,4 +1,4 @@
-# <img src="assets/logo-square.png" alt="Clifton" width="32" height="32" align="absmiddle"> Clifton MCP
+# <img src="assets/logo-square.png" alt="Clifton" width="32" height="32" align="middle"> Clifton MCP
 
 [![Build](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
@@ -57,7 +57,7 @@ Full tool reference, auth, and errors: [API.md](API.md).
 
 ## Get an account
 
-Sign up at [console.cliftonapi.com](https://console.cliftonapi.com) for an API key and trial. Learn more at [cliftonai.com](https://www.cliftonai.com).
+Sign up at [console.cliftonapi.com](https://console.cliftonapi.com) for an API key and trial. Learn more at [cliftonai.com](https://cliftonai.com).
 
 ## Docs
 
@@ -67,3 +67,7 @@ Sign up at [console.cliftonapi.com](https://console.cliftonapi.com) for an API k
 - [SUPPORT.md](SUPPORT.md) — how to get help
 - [SECURITY.md](SECURITY.md) — vulnerability reporting
 - [CHANGELOG.md](CHANGELOG.md) — changes to the tool surface
+
+## Legal
+
+[Privacy Policy](https://cliftonai.com/#/privacy) · [Terms of Service](https://cliftonai.com/#/terms)
