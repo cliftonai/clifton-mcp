@@ -3,7 +3,7 @@
 Plugin (recommended — OAuth, no key):
 
 ```text
-/plugin marketplace add Clifton-Software-Inc/clifton-mcp
+/plugin marketplace add cliftonai/clifton-mcp
 /plugin install clifton-mcp@clifton-mcp
 ```
 

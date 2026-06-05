@@ -1,9 +1,9 @@
 # <img src="assets/logo-square.png" alt="Clifton" width="32" height="32" align="absmiddle"> Clifton MCP
 
-[![Build](https://github.com/Clifton-Software-Inc/clifton-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Clifton-Software-Inc/clifton-mcp/actions/workflows/ci.yml)
+[![Build](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Clifton-Software-Inc/clifton-mcp/pulls)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
 Clifton exposes one MCP tool, `clifton_ask`, for markets and finance research — public companies, ETFs, crypto, bonds, options, and macro data. It answers from SEC filings, earnings transcripts, analyst expectations, market data, and news, then cites the documents or data it used.
 
@@ -29,7 +29,7 @@ Sign in with your Clifton account when prompted. In ChatGPT, custom MCP apps req
 ### Claude Code Plugin
 
 ```
-/plugin marketplace add Clifton-Software-Inc/clifton-mcp
+/plugin marketplace add cliftonai/clifton-mcp
 /plugin install clifton-mcp@clifton-mcp
 ```
 

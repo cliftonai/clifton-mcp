@@ -53,7 +53,7 @@ PKCE-only (no client secrets). Refresh tokens are accepted at the token endpoint
 **Plugin (OAuth):**
 
 ```text
-/plugin marketplace add Clifton-Software-Inc/clifton-mcp
+/plugin marketplace add cliftonai/clifton-mcp
 /plugin install clifton-mcp@clifton-mcp
 ```
 

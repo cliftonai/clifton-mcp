@@ -9,8 +9,8 @@
     "email": "support@cliftonai.com",
     "url": "https://www.cliftonai.com"
   },
-  "homepage": "https://github.com/Clifton-Software-Inc/clifton-mcp",
-  "repository": "https://github.com/Clifton-Software-Inc/clifton-mcp",
+  "homepage": "https://github.com/cliftonai/clifton-mcp",
+  "repository": "https://github.com/cliftonai/clifton-mcp",
   "license": "MIT",
   "keywords": ["mcp", "finance", "sec-filings", "earnings", "claude", "research"],
   "mcpServers": "./.mcp.json"

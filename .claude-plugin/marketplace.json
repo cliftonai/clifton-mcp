@@ -12,7 +12,7 @@
       "displayName": "Clifton MCP",
       "description": "Source-linked financial research: SEC filings, transcripts, expectations, and market reactions, callable from your agent.",
       "source": "./plugins/clifton-mcp",
-      "homepage": "https://github.com/Clifton-Software-Inc/clifton-mcp",
+      "homepage": "https://github.com/cliftonai/clifton-mcp",
       "license": "MIT",
       "keywords": ["mcp", "finance", "sec-filings", "earnings", "claude", "research"],
       "category": "finance"

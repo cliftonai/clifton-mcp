@@ -119,7 +119,7 @@ For terminal / editor workflows. The Claude Code **plugin** bundles the `clifton
 Use the **Clifton plugin** (OAuth, no key). It installs `clifton_ask` **plus** the `clifton-research` skill — so Claude Code automatically routes markets and finance questions to Clifton (sourced from SEC filings + market data). Cursor, Codex, and the connector paths add the tool only.
 
 ```text
-/plugin marketplace add Clifton-Software-Inc/clifton-mcp
+/plugin marketplace add cliftonai/clifton-mcp
 /plugin install clifton-mcp@clifton-mcp
 ```
 
