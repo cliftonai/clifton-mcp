@@ -125,7 +125,18 @@ Use the **Clifton plugin** (OAuth, no key). It installs `clifton_ask` **plus** t
 
 The first time you ask a question, Claude Code opens a browser for Clifton sign-in. Then skip to **Your first question** below.
 
-Prefer an API key (no plugin, no skill)? Create one at **Settings → API keys** in the console, then:
+> **OAuth requires the fixed callback port `8765`.** Clifton sign-in only accepts the exact redirect `http://localhost:8765/callback`; a random port is rejected. The plugin ships `oauth.callbackPort: 8765` in its config to pin this. After installing and restarting Claude Code, confirm it took with `claude mcp get clifton` — the output should show `OAuth: callback_port 8765`. If it shows a different or random port, use the manual command below instead.
+
+**Recommended OAuth path (explicit, no skill):** add the server yourself with the port pinned. This is the most reliable way to get OAuth working:
+
+```bash
+claude mcp add --transport http --callback-port 8765 \
+  clifton https://ai.cliftonapi.com/v1/mcp
+```
+
+Then run `/mcp` and choose **clifton** to sign in. The `--callback-port 8765` flag is required — without it Claude Code picks a random port that Clifton's sign-in rejects.
+
+Prefer an **API key** (no plugin, no skill, no browser)? Create one at **Settings → API keys** in the console, then:
 
 ```bash
 export CLIFTON_API_KEY="paste-your-key-here"
@@ -133,9 +144,9 @@ claude mcp add --transport http clifton https://ai.cliftonapi.com/v1/mcp \
   --header "X-API-Key: $CLIFTON_API_KEY"
 ```
 
-Verify either way: ask *"What tools does Clifton provide?"* — the response lists `clifton_ask`.
+Verify any path: ask *"What tools does Clifton provide?"* — the response lists `clifton_ask`.
 
-> Reference: [Connect Claude Code to tools via MCP](https://code.claude.com/docs/en/mcp) — plugin install, `claude mcp add`, OAuth via `/mcp`.
+> Reference: [Connect Claude Code to tools via MCP](https://code.claude.com/docs/en/mcp) — plugin install, `claude mcp add`, `--callback-port`, OAuth via `/mcp`.
 
 ## Cursor
 
