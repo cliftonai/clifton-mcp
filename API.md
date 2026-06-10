@@ -133,6 +133,19 @@ Questions about markets and finance — public companies, tickers, sectors, inde
 | `structuredContent.session_id` | string \| null | Server-acknowledged session id. Echo to continue. |
 | `structuredContent.request_id` | string | Present on errors. Identifies the call in Clifton's logs; quote it when contacting support. |
 
+### Agent tools
+
+Four tools for creating and reading Clifton agents (standing monitors that generate reports when their condition fires). Full guide with examples, the agent limit, `output_mode`, and `owner_email` semantics: [AGENT-TOOLS.md](AGENT-TOOLS.md).
+
+| Tool | Summary | Key input fields |
+|---|---|---|
+| `clifton_create_agent` | Multi-turn agent creation; commits on your confirmation | `message` (required), `session_id`, `output_mode` (`chat` \| `models`) |
+| `clifton_list_agents` | List agents, newest first | `owner_email`*, `limit` (default 10), `offset` |
+| `clifton_list_agent_reports` | List report summaries, newest first | `owner_email`*, `agent_id`, `limit` (default 10), `offset` |
+| `clifton_get_agent_report` | One report: markdown (chat), spreadsheet link (models), or a no-report `reason` | report id, `owner_email`* |
+
+\* `owner_email` defaults to the signed-in user for OAuth callers; required for API-key callers and must belong to the key's organization. Cross-organization reads are rejected.
+
 ---
 
 ## Operational Notes (Not Contract)

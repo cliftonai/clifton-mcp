@@ -52,6 +52,7 @@ Config snippets live in [`examples/`](examples/).
 ## Tools
 
 - **`clifton_ask`** — answers markets & finance questions (equities, ETFs, crypto, bonds, options, macro) from filings, earnings transcripts, analyst expectations, market data, and news; returns citations.
+- **Agent tools** — `clifton_create_agent` creates a standing monitor through a short conversation (written reports or financial models); `clifton_list_agents`, `clifton_list_agent_reports`, and `clifton_get_agent_report` read your agents and their reports. Guide: [AGENT-TOOLS.md](AGENT-TOOLS.md).
 
 Full tool reference, auth, and errors: [API.md](API.md).
 
