@@ -14,7 +14,7 @@ Technical reference for connecting an MCP host to Clifton. Use this for Claude C
 - **Protocol:** JSON-RPC 2.0 single-request per POST. Batch arrays are **not** supported.
 - **Region:** us-east-2.
 
-The pinned `tools/list` snapshot is published at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. Fetch it before setup if your client validates tool schemas ahead of time.
+The public `tools/list` snapshot is published at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. OAuth-only tools are returned by authenticated `tools/list` after sign-in.
 
 ---
 
@@ -106,7 +106,7 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 
 ## Available tools
 
-> **Canonical contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. Fetch this URL for the current tool names, descriptions, JSON Schemas, and annotations. The summary below is non-authoritative and may lag the live contract.
+> **Tool contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json` lists public tools. OAuth-only tools, including `clifton_create_agent`, are returned by authenticated `tools/list` after sign-in. The summary below is non-authoritative and may lag the live contract.
 
 ### `clifton_ask` *(read-only)*
 
@@ -179,7 +179,7 @@ For unresolved issues, include the `X-Request-Id` from the failing response and 
 
 ## Further reading
 
-- Pinned tool contract: `https://ai.cliftonapi.com/.well-known/mcp-tools.json`
+- Public tool contract: `https://ai.cliftonapi.com/.well-known/mcp-tools.json`
 - OAuth protected-resource metadata: `https://ai.cliftonapi.com/.well-known/oauth-protected-resource`
 - Customer setup walkthrough: [INSTALL.md](INSTALL.md)
 - Common host issues: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)

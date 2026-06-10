@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
-Clifton exposes one MCP tool, `clifton_ask`, for markets and finance research — public companies, ETFs, crypto, bonds, options, and macro data. It answers from SEC filings, earnings transcripts, analyst expectations, market data, and news, then cites the documents or data it used.
+Clifton exposes MCP tools for markets and finance research plus recurring agents. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, and news, then cites the documents or data it used.
 
 ![Clifton answering a financial research question in Claude](assets/demo.gif)
 
