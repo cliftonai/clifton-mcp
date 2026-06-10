@@ -11,7 +11,12 @@ Four tools:
 | `clifton_list_agent_reports` | List reports your agents have generated |
 | `clifton_get_agent_report` | Fetch one report's content |
 
-Authentication is the same as `clifton_ask`: OAuth sign-in or an `X-API-Key` header ([API.md → Authentication](API.md#authentication)). The canonical schemas live at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`.
+Authentication ([API.md → Authentication](API.md#authentication)) differs by tool:
+
+- **`clifton_create_agent` requires OAuth sign-in.** It is not available to API-key callers — the server omits it from their tool list. Creation acts as a specific user, and an org-scoped API key has no user identity.
+- **The three read tools accept either** OAuth or an `X-API-Key` header.
+
+The canonical schemas live at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`.
 
 ---
 
@@ -49,7 +54,7 @@ Optional. If you omit it, Clifton confirms the output type during the preview. S
 
 ### Agent limit
 
-Organizations have a cap on concurrently **enabled** agents. If creation would exceed it, the agent is saved as **paused** instead, and the response is `status: "error"` with a `workflow_limit_exceeded` block carrying your `limit` and current `active_count`. Pause or delete an agent in the [console](https://console.cliftonapi.com), then resume the new one — nothing is lost.
+Organizations have a cap on concurrently **enabled** agents. If creation would exceed it, the agent is saved with status `disabled` (the console calls this *paused*) instead, and the response is `status: "error"` with a `workflow_limit_exceeded` block carrying your `limit` and current `active_count`. Pause or delete an agent in the [console](https://console.cliftonapi.com), then resume the new one — nothing is lost.
 
 ### Timeouts
 
@@ -72,7 +77,7 @@ Cross-organization reads are rejected.
 
 ### `clifton_list_agents`
 
-Returns your agents, newest first: name, status (enabled/paused), schedule, and console link. Paginated with `limit` (default 10, max 1000) and `offset`.
+Returns your agents, newest first, with their `status` — one of `enabled`, `disabled` (shown as *paused* in the console), `creating`, `error`, or `awaiting_user_confirmation` — plus prompts, recipients, and report counts. Filter with `status` or `tags`. Paginated with `limit` (default 10, max 1000) and `offset`.
 
 ### `clifton_list_agent_reports`
 

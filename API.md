@@ -139,7 +139,7 @@ Four tools for creating and reading Clifton agents (standing monitors that gener
 
 | Tool | Summary | Key input fields |
 |---|---|---|
-| `clifton_create_agent` | Multi-turn agent creation; commits on your confirmation | `message` (required), `session_id`, `output_mode` (`chat` \| `models`) |
+| `clifton_create_agent` | Multi-turn agent creation; commits on your confirmation. **OAuth only** — not offered to API-key callers | `message` (required), `session_id`, `output_mode` (`chat` \| `models`) |
 | `clifton_list_agents` | List agents, newest first | `owner_email`*, `limit` (default 10), `offset` |
 | `clifton_list_agent_reports` | List report summaries, newest first | `owner_email`*, `agent_id`, `limit` (default 10), `offset` |
 | `clifton_get_agent_report` | One report: markdown (chat), spreadsheet link (models), or a no-report `reason` | report id, `owner_email`* |
