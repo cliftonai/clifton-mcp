@@ -68,6 +68,8 @@ File attachments from the MCP host are **not** supported. The `attachments` fiel
 
 ## Reading agents and reports
 
+Read calls count toward your organization's MCP rate limits (the same per-org caps as other Clifton MCP tools); they do not consume chat quota.
+
 ### Who you read as: `owner_email`
 
 - **OAuth callers** (signed in): `owner_email` is optional and defaults to you. You may pass another member of your organization to read their agents.
