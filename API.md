@@ -14,7 +14,7 @@ Technical reference for connecting an MCP host to Clifton. Use this for Claude C
 - **Protocol:** JSON-RPC 2.0 single-request per POST. Batch arrays are **not** supported.
 - **Region:** us-east-2.
 
-The pinned `tools/list` snapshot is published at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. Fetch it before setup if your client validates tool schemas ahead of time.
+The public `tools/list` snapshot is published at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. OAuth-only tools are returned by authenticated `tools/list` after sign-in.
 
 ---
 
@@ -106,7 +106,7 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 
 ## Available tools
 
-> **Canonical contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. Fetch this URL for the current tool names, descriptions, JSON Schemas, and annotations. The summary below is non-authoritative and may lag the live contract.
+> **Tool contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json` lists public tools. OAuth-only tools, including `clifton_create_agent`, are returned by authenticated `tools/list` after sign-in. The summary below is non-authoritative and may lag the live contract.
 
 ### `clifton_ask` *(read-only)*
 
@@ -132,6 +132,19 @@ Questions about markets and finance — public companies, tickers, sectors, inde
 | `structuredContent.citations` | array | Parsed citation objects (`url`, `text`, `snippet`). |
 | `structuredContent.session_id` | string \| null | Server-acknowledged session id. Echo to continue. |
 | `structuredContent.request_id` | string | Present on errors. Identifies the call in Clifton's logs; quote it when contacting support. |
+
+### Agent tools
+
+Four tools for creating and reading Clifton agents (standing monitors that generate reports when their condition fires). Full guide with examples, the agent limit, `output_mode`, and `owner_email` semantics: [AGENT-TOOLS.md](AGENT-TOOLS.md).
+
+| Tool | Summary | Key input fields |
+|---|---|---|
+| `clifton_create_agent` | Multi-turn agent creation; commits on your confirmation. **OAuth only** — not offered to API-key callers | `message` (required), `session_id`, `output_mode` (`chat` \| `models`) |
+| `clifton_list_agents` | List agents, newest first | `owner_email`*, `limit` (default 10), `offset` |
+| `clifton_list_agent_reports` | List report summaries, newest first | `owner_email`*, `agent_id`, `limit` (default 10), `offset` |
+| `clifton_get_agent_report` | One report: markdown (chat), spreadsheet link (models), or a no-report `reason` | report id, `owner_email`* |
+
+\* `owner_email` defaults to the signed-in user for OAuth callers; required for API-key callers and must belong to the key's organization. Cross-organization reads are rejected.
 
 ---
 
@@ -166,7 +179,7 @@ For unresolved issues, include the `X-Request-Id` from the failing response and 
 
 ## Further reading
 
-- Pinned tool contract: `https://ai.cliftonapi.com/.well-known/mcp-tools.json`
+- Public tool contract: `https://ai.cliftonapi.com/.well-known/mcp-tools.json`
 - OAuth protected-resource metadata: `https://ai.cliftonapi.com/.well-known/oauth-protected-resource`
 - Customer setup walkthrough: [INSTALL.md](INSTALL.md)
 - Common host issues: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)

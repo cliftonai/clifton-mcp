@@ -31,12 +31,12 @@ The API key is invalid, or the OAuth session expired. Create a new key in the [C
 
 The question needed more time than the client-safe budget allows. The response includes a Clifton-console link — open it to continue the question there — or ask a narrower question. If you contact support, quote the `request_id` from the response.
 
-### A tool argument is rejected, or your host shows an option Clifton no longer has
+### Your host shows fewer or older Clifton tools than expected, or rejects a tool argument
 
-Your host cached an older copy of Clifton's tool list. When Clifton updates a tool (adds or removes an argument), the host keeps using its cached version until it reconnects — so it may keep sending an argument the server now rejects, or keep offering one that's gone. **Reconnect Clifton to refresh the tool list, then retry:**
+Your host cached an older copy of Clifton's tool list. When Clifton releases a new tool or updates an existing one, the host keeps using its cached version until it reconnects — newly released tools (such as the agent tools) won't appear, and a changed argument may be rejected or a removed one still offered. **Reconnect Clifton to refresh the tool list, then retry:**
 
 - **Claude Code:** run `/mcp`, reconnect Clifton — or restart Claude Code. (Plugin install: `/plugin uninstall clifton-mcp@clifton-mcp` then re-install also forces a clean fetch.)
-- **Claude Web / Desktop:** open **Connectors**, toggle Clifton **off and on** (or remove and re-add it).
+- **Claude Web / Desktop:** open **Connectors**, toggle Clifton **off and on** (or remove and re-add it). Restarting the app alone is **not** enough — the tool list is tied to the connector, not the app session.
 - **Cursor:** restart Cursor, or toggle the Clifton server off/on in **Settings → MCP**.
 - **Codex:** restart Codex.
 
