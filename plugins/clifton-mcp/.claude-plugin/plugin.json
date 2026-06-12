@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "clifton-mcp",
   "displayName": "Clifton MCP",
-  "version": "0.1.1",
-  "description": "Source-linked financial research over MCP — SEC filings, transcripts, expectations, and market reactions.",
+  "version": "0.1.2",
+  "description": "Source-linked financial research and standing market-monitor agents over MCP — SEC filings, transcripts, expectations, market reactions, and recurring alerts.",
   "author": {
     "name": "Clifton Software, Inc.",
     "email": "support@cliftonai.com",
