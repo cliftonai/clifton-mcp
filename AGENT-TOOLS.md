@@ -43,6 +43,18 @@ Each response carries a `status`:
 
 Pass `session_id` from each response into your next call. Hosts do this automatically when you just keep talking.
 
+### Host behavior during creation
+
+For MCP hosts (and host-side skills) driving this tool on a user's behalf:
+
+- Relay Clifton's clarifying questions and previews to the user **verbatim**; do not answer them or confirm for the user.
+- `creating` means *continue the same conversation* — reply on the same `session_id`, not with a fresh call.
+- Treat the agent as created only on `status: "enabled"` with an `agent_url` or `workflow_id`.
+
+### Broad or changing conditions
+
+Some requests define the watched set by **condition** rather than by name — "any company over $500B", "banks above a deposit threshold", "stocks in the retail sector". Pass the condition through in the user's words. Clifton's preview may resolve such a condition into a fixed list of names as of today; the preview will say so. If the user intended ongoing coverage (companies that meet the condition in the future), surface that difference and ask whether they want a fixed snapshot or ongoing coverage — a snapshot will not update by itself.
+
 ### Choosing the output type: `output_mode`
 
 | Value | The agent produces |
