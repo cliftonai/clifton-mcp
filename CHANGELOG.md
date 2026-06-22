@@ -4,6 +4,8 @@ Public changes to the Clifton MCP tool surface.
 
 ## [Unreleased]
 
+- **Data Vault file discovery.** OAuth users can use `clifton_list_vault_files` to find Clifton Data Vault file IDs, then pass those IDs to `clifton_ask.attachments`.
+
 ## [0.1.2] - 2026-06-12
 
 - **Skill covers agents.** The `clifton-research` skill now triggers for agent flows — creating standing monitors (create/watch/alert/schedule) and reading agents and reports — and teaches hosts the creation loop: relay clarifying questions and previews, continue on the same `session_id`, never confirm on the user's behalf, and treat only `status: "enabled"` as created.

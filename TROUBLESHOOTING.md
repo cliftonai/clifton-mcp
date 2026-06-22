@@ -33,7 +33,7 @@ The question needed more time than the client-safe budget allows. The response i
 
 ### Your host shows fewer or older Clifton tools than expected, or rejects a tool argument
 
-Your host cached an older copy of Clifton's tool list. When Clifton releases a new tool or updates an existing one, the host keeps using its cached version until it reconnects — newly released tools (such as the agent tools) won't appear, and a changed argument may be rejected or a removed one still offered. **Reconnect Clifton to refresh the tool list, then retry:**
+Your host cached an older copy of Clifton's tool list. When Clifton releases a new tool or updates an existing one, the host keeps using its cached version until it reconnects — newly released tools such as `clifton_list_vault_files` or the agent tools won't appear, and a changed argument may be rejected or a removed one still offered. **Reconnect Clifton to refresh the tool list, then retry:**
 
 - **Claude Code:** run `/mcp`, reconnect Clifton — or restart Claude Code. (Plugin install: `/plugin uninstall clifton-mcp@clifton-mcp` then re-install also forces a clean fetch.)
 - **Claude Web / Desktop:** open **Connectors**, toggle Clifton **off and on** (or remove and re-add it). Restarting the app alone is **not** enough — the tool list is tied to the connector, not the app session.
