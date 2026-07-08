@@ -31,6 +31,7 @@ You'll also need:
 | **Claude Code** (CLI) | Plugin (one command, no key — also adds a skill) or API key | < 1 min |
 | **Cursor** | API key + JSON snippet | ~ 2 min |
 | **Codex** (CLI) | API key + TOML snippet | ~ 2 min |
+| **Codex** (Desktop app) | API key + form fields | < 1 min |
 
 > **Tool vs. skill:** Every path connects the same `clifton_ask` tool. The **Claude Code plugin** also installs the `clifton-research` skill, which nudges Claude Code to use Clifton for finance questions. Connector and API-key paths add the tool only.
 
@@ -173,6 +174,10 @@ Verify: in a Cursor chat, ask *"What tools does Clifton provide?"* — it lists 
 
 ## Codex
 
+Codex has two setup paths depending on whether you're on the CLI or the desktop app. Both write the same config underneath.
+
+### Codex CLI
+
 Create an API key in the console, then add to `~/.codex/config.toml`:
 
 ```toml
@@ -187,6 +192,22 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 > The table is `mcp_servers` (not `mcp`). Streamable-HTTP MCP requires the RMCP client — `[features].rmcp_client = true` (older builds: `experimental_use_rmcp_client = true` at the top level). Without it Codex expects a stdio `command` and fails with `missing field command`. With the flag, Codex sends `http_headers` natively, so no `transport` field or `mcp-remote` bridge is needed.
 
 Restart Codex and ask *"What tools does Clifton provide?"*
+
+### Codex Desktop app
+
+Create an API key in the console, then find the **Connect to a custom MCP** screen in Codex's settings (menu path varies by build).
+
+The form defaults to the **STDIO** tab (for locally-launched command-line servers). Switch to the **Streamable HTTP** tab first — Clifton is a remote server, not a local command, so the STDIO fields (Command to launch, Arguments, Working directory) don't apply and won't work.
+
+On the Streamable HTTP tab, fill in:
+
+| Field | Value |
+|---|---|
+| Name | `clifton` |
+| URL | `https://ai.cliftonapi.com/v1/mcp` |
+| Header | `X-API-Key: paste-your-key-here` |
+
+Save, then ask *"What tools does Clifton provide?"*
 
 ---
 
