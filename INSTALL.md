@@ -1,6 +1,6 @@
 # Connect Clifton over MCP
 
-Clifton's MCP server lets Claude, ChatGPT, and developer CLIs (Claude Code, Cursor, Codex) call `clifton_ask` for markets and finance questions — equities, ETFs, crypto, bonds, options, macro, SEC filings, and earnings. Use it for questions like *"why is NVDA moving today?"* or *"did AAPL add new risk factors in its latest 10-K?"*
+Clifton's MCP server lets Claude, ChatGPT, and developer CLIs (Claude Code, Cursor, Codex) call `clifton_ask` for markets and finance questions. Connected hosts can also list authorized Clifton Data Vault files and attach them to an ask.
 
 OAuth hosts need the MCP URL. API-key hosts need the same URL plus an `X-API-Key` header.
 
@@ -33,7 +33,7 @@ You'll also need:
 | **Codex** (CLI) | API key + TOML snippet | ~ 2 min |
 | **Codex** (Desktop app) | API key + form fields | < 1 min |
 
-> **Tool vs. skill:** Every path connects the same `clifton_ask` tool. The **Claude Code plugin** also installs the `clifton-research` skill, which nudges Claude Code to use Clifton for finance questions. Connector and API-key paths add the tool only.
+> **Tool vs. skill:** Every path connects `clifton_ask`. OAuth and API-key paths may also expose `clifton_list_vault_files`. The **Claude Code plugin** installs the `clifton-research` skill, which routes finance questions to Clifton. Connector and API-key paths add MCP tools only.
 
 Use the section for your host. Most people want the first one.
 
@@ -91,7 +91,7 @@ Custom MCP apps in ChatGPT require **Developer mode**. OpenAI currently document
 - **Enterprise / Edu:** admins grant access; enabled users turn it on under **Settings → Apps → Advanced Settings**.
 - If you do not see **Apps → Create**, your workspace probably does not have Developer mode enabled.
 
-> Developer mode can enable apps with write actions. Clifton currently exposes only the read-only `clifton_ask` tool, but enable Developer mode deliberately.
+> Developer mode can enable apps with write actions. Clifton includes agent-creation tools, so enable Developer mode deliberately.
 
 ### 2. Create the Clifton app
 
@@ -145,7 +145,7 @@ claude mcp add --transport http clifton https://ai.cliftonapi.com/v1/mcp \
   --header "X-API-Key: $CLIFTON_API_KEY"
 ```
 
-Verify any path: ask *"What tools does Clifton provide?"* — the response lists `clifton_ask`.
+Verify any path: ask *"What tools does Clifton provide?"* The response lists `clifton_ask`; eligible OAuth and API-key connections also list `clifton_list_vault_files`.
 
 > Reference: [Connect Claude Code to tools via MCP](https://code.claude.com/docs/en/mcp) — plugin install, `claude mcp add`, `--callback-port`, OAuth via `/mcp`.
 

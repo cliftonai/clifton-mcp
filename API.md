@@ -106,7 +106,7 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 
 ## Available tools
 
-> **Tool contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json` lists public tools. OAuth-only tools, including `clifton_create_agent`, are returned by authenticated `tools/list` after sign-in. The summary below is non-authoritative and may lag the live contract.
+> **Tool contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json` lists public tools. Authenticated `tools/list` applies user and organization gates and is authoritative for the caller. The summary below is non-authoritative and may lag the live contract.
 
 ### `clifton_ask` *(read-only)*
 
@@ -120,7 +120,7 @@ Questions about markets and finance — public companies, tickers, sectors, inde
 | `session_id` | string | no | Echo back from a prior response to continue a conversation. |
 | `incognito` | boolean | no | Skip persistence. |
 | `data_sources` | string[] | no | Restrict retrieval to a subset of sources. |
-| `attachments` | string[] | no | Document IDs to include. |
+| `attachments` | string[] | no | Clifton Data Vault file IDs to include. Use `clifton_list_vault_files` to find accessible IDs. |
 | `context` | object | no | Host-supplied metadata. |
 
 **Output**
@@ -132,6 +132,33 @@ Questions about markets and finance — public companies, tickers, sectors, inde
 | `structuredContent.citations` | array | Parsed citation objects (`url`, `text`, `snippet`). |
 | `structuredContent.session_id` | string \| null | Server-acknowledged session id. Echo to continue. |
 | `structuredContent.request_id` | string | Present on errors. Identifies the call in Clifton's logs; quote it when contacting support. |
+
+### `clifton_list_vault_files` *(read-only)*
+
+Find Clifton Data Vault files for an authorized owner, then pass returned file IDs to `clifton_ask.attachments`.
+
+OAuth callers default to the signed-in user. API-key callers must pass an `owner_email` for a manager in the authenticated organization.
+
+**Input**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `query` | string | no | Search by filename and indexed file content when available. Omit to browse folders. Max 100 characters. |
+| `folder_path` | string | no | Folder path to browse or constrain search. Defaults to `/`. |
+| `storage_class` | `EPHEMERAL` \| `DURABLE` | no | Optional storage class filter. |
+| `limit` | integer | no | Defaults to 50; maximum 1000. |
+| `offset` | integer | no | Zero-based pagination offset. |
+| `owner_email` | string | API key only | Vault owner. OAuth defaults to the signed-in user; API keys require an authorized manager email. |
+
+**Output**
+
+| Field | Type | Notes |
+|---|---|---|
+| `files` | array | File metadata including `file_id`, filename, content type, size, scope, folder, and timestamps. |
+| `folders` | array | Immediate child folders when browsing. Empty when `query` is provided. |
+| `attachment_ids` | string[] | File IDs from `files[].file_id`; pass these to `clifton_ask.attachments`. |
+| `current_path` | string | Folder path used for the result. |
+| `pagination` | object | `limit`, `offset`, `total`, `count`, `has_more`. |
 
 ### Agent tools
 

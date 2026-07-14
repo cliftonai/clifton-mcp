@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
-Clifton exposes MCP tools for markets and finance research plus recurring agents. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, and news, then cites the documents or data it used.
+Clifton exposes MCP tools for markets and finance research, Data Vault file discovery, and recurring agents. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, news, and attached Clifton Data Vault files, then cites the documents or data it used.
 
 ![Clifton answering a financial research question in Claude](assets/demo.gif)
 
@@ -52,6 +52,7 @@ Config snippets live in [`examples/`](examples/).
 ## Tools
 
 - **`clifton_ask`** — answers markets & finance questions (equities, ETFs, crypto, bonds, options, macro) from filings, earnings transcripts, analyst expectations, market data, and news; returns citations.
+- **`clifton_list_vault_files`:** OAuth and API-key file discovery for Clifton Data Vault. Use returned file IDs in `clifton_ask.attachments`.
 - **Agent tools** — `clifton_create_agent` creates a standing monitor through a short conversation (written reports or financial models); `clifton_list_agents`, `clifton_list_agent_reports`, and `clifton_get_agent_report` read your agents and their reports. Guide: [AGENT-TOOLS.md](AGENT-TOOLS.md).
 
 Full tool reference, auth, and errors: [API.md](API.md).

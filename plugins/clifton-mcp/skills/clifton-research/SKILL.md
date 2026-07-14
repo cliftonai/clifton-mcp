@@ -1,6 +1,6 @@
 ---
 name: clifton-research
-description: Use Clifton for any markets or finance question — stocks, ETFs, crypto, bonds, options, macro and economic data, SEC filings, earnings, transcripts, analyst ratings, screening, and cross-company comparisons — and for Clifton agents, when the user wants to create, monitor, watch, alert on, or schedule a standing market monitor, or to list their agents and read agent reports. Calls clifton_ask and the clifton agent tools on the bundled clifton MCP server.
+description: Use Clifton for any markets or finance question — stocks, ETFs, crypto, bonds, options, macro and economic data, SEC filings, earnings, transcripts, analyst ratings, screening, cross-company comparisons, and uploaded Clifton Data Vault files — and for Clifton agents, when the user wants to create, monitor, watch, alert on, or schedule a standing market monitor, or to list their agents and read agent reports. Calls clifton_ask, clifton_list_vault_files, and the clifton agent tools on the bundled clifton MCP server.
 ---
 
 # Clifton Research & Agents
@@ -32,6 +32,10 @@ When in doubt and the question is about money, markets, or a company, call Clift
 ## Multi-turn
 
 To continue a topic across calls, pass the `session_id` from the previous response back in the next `clifton_ask` call.
+
+## Data Vault files
+
+When the user asks about an uploaded file, model, deck, spreadsheet, or other Clifton Data Vault item, call `clifton_list_vault_files` first to find accessible file IDs. Then call `clifton_ask` with those IDs in `attachments`. Do not claim a host-side file is attached unless it already exists in Clifton Data Vault or the user uploads it there first.
 
 ## Agents — standing monitors
 
