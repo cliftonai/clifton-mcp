@@ -16,7 +16,7 @@ Authentication ([API.md → Authentication](API.md#authentication)) differs by t
 - **`clifton_create_agent` requires OAuth sign-in.** It is not available to API-key callers — the server omits it from their tool list. Creation acts as a specific user, and an org-scoped API key has no user identity.
 - **The three read tools accept either** OAuth or an `X-API-Key` header.
 
-The read-tool schemas are listed at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. `clifton_create_agent` and `clifton_list_vault_files` are OAuth-only, so their schemas appear in authenticated `tools/list` after sign-in. Don't see these tools in your host? Reconnect the Clifton connection — see [TROUBLESHOOTING.md](TROUBLESHOOTING.md#your-host-shows-fewer-or-older-clifton-tools-than-expected-or-rejects-a-tool-argument).
+The public schemas are listed at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. Authenticated `tools/list` applies user and organization gates and is authoritative for the caller. If your host does not show these tools, reconnect the Clifton connection. See [TROUBLESHOOTING.md](TROUBLESHOOTING.md#your-host-shows-fewer-or-older-clifton-tools-than-expected-or-rejects-a-tool-argument).
 
 ---
 

@@ -106,7 +106,7 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 
 ## Available tools
 
-> **Tool contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json` lists public tools. OAuth-only tools, including `clifton_create_agent` and `clifton_list_vault_files`, are returned by authenticated `tools/list` after sign-in. The summary below is non-authoritative and may lag the live contract.
+> **Tool contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json` lists public tools. Authenticated `tools/list` applies user and organization gates and is authoritative for the caller. The summary below is non-authoritative and may lag the live contract.
 
 ### `clifton_ask` *(read-only)*
 
@@ -133,11 +133,11 @@ Questions about markets and finance — public companies, tickers, sectors, inde
 | `structuredContent.session_id` | string \| null | Server-acknowledged session id. Echo to continue. |
 | `structuredContent.request_id` | string | Present on errors. Identifies the call in Clifton's logs; quote it when contacting support. |
 
-### `clifton_list_vault_files` *(read-only, OAuth only)*
+### `clifton_list_vault_files` *(read-only)*
 
-Find Clifton Data Vault files the signed-in user can access, then pass returned file IDs to `clifton_ask.attachments`.
+Find Clifton Data Vault files for an authorized owner, then pass returned file IDs to `clifton_ask.attachments`.
 
-API-key callers do not see this tool because Data Vault USER-scope files require a signed-in user identity.
+OAuth callers default to the signed-in user. API-key callers must pass an `owner_email` for a manager in the authenticated organization.
 
 **Input**
 
@@ -148,6 +148,7 @@ API-key callers do not see this tool because Data Vault USER-scope files require
 | `storage_class` | `EPHEMERAL` \| `DURABLE` | no | Optional storage class filter. |
 | `limit` | integer | no | Defaults to 50; maximum 1000. |
 | `offset` | integer | no | Zero-based pagination offset. |
+| `owner_email` | string | API key only | Vault owner. OAuth defaults to the signed-in user; API keys require an authorized manager email. |
 
 **Output**
 

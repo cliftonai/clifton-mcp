@@ -4,7 +4,7 @@ Public changes to the Clifton MCP tool surface.
 
 ## [Unreleased]
 
-- **Data Vault file discovery.** OAuth users can use `clifton_list_vault_files` to find Clifton Data Vault file IDs, then pass those IDs to `clifton_ask.attachments`.
+- **Data Vault file discovery.** OAuth and API-key callers can use `clifton_list_vault_files` to find authorized Clifton Data Vault file IDs, then pass those IDs to `clifton_ask.attachments`.
 
 ## [0.1.2] - 2026-06-12
 
