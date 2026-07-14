@@ -1,19 +1,21 @@
 # Clifton Agents over MCP
 
-Create and read **Clifton agents** — standing monitors that watch markets, filings, transcripts, and news for a condition you describe, then generate a report when it fires — directly from an MCP host (Claude Code, Claude Desktop, Cursor, or any client connected per [INSTALL.md](INSTALL.md)).
+Use an MCP host to create, delete, and read **Clifton agents**. These standing monitors watch markets, filings, transcripts, and news, then generate a report when a condition fires. Supported hosts include Claude Code, Claude Desktop, Cursor, and any client connected per [INSTALL.md](INSTALL.md).
 
-Four tools:
+Five tools:
 
 | Tool | What it does |
 |---|---|
 | `clifton_create_agent` | Multi-turn conversation that defines and enables a new agent |
+| `clifton_delete_agent` | Delete one agent owned by an authorized user |
 | `clifton_list_agents` | List your agents (name, status, schedule) |
 | `clifton_list_agent_reports` | List reports your agents have generated |
 | `clifton_get_agent_report` | Fetch one report's content |
 
 Authentication ([API.md → Authentication](API.md#authentication)) differs by tool:
 
-- **`clifton_create_agent` requires OAuth sign-in.** It is not available to API-key callers — the server omits it from their tool list. Creation acts as a specific user, and an org-scoped API key has no user identity.
+- **`clifton_create_agent` accepts OAuth and approved API-key callers.** OAuth callers default to the signed-in user. API-key callers see the tool only when Clifton has enabled API-key creation for their organization; they must pass an `owner_email` for a manager in that organization.
+- **`clifton_delete_agent` accepts OAuth and API keys.** OAuth callers default to the signed-in user. API-key callers must pass an `owner_email` for a manager in their organization.
 - **The three read tools accept either** OAuth or an `X-API-Key` header.
 
 The public schemas are listed at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. Authenticated `tools/list` applies user and organization gates and is authoritative for the caller. If your host does not show these tools, reconnect the Clifton connection. See [TROUBLESHOOTING.md](TROUBLESHOOTING.md#your-host-shows-fewer-or-older-clifton-tools-than-expected-or-rejects-a-tool-argument).
@@ -66,7 +68,7 @@ Optional. If you omit it, Clifton confirms the output type during the preview. S
 
 ### Agent limit
 
-Organizations have a cap on concurrently **enabled** agents. If creation would exceed it, the agent is saved with status `disabled` (the console calls this *paused*) instead, and the response is `status: "error"` with a `workflow_limit_exceeded` block carrying your `limit` and current `active_count`. Pause or delete an agent in the [console](https://console.cliftonapi.com), then resume the new one — nothing is lost.
+Organizations have a cap on concurrently **enabled** agents. If creation would exceed it, the agent is saved with status `disabled` (the console calls this *paused*) instead, and the response is `status: "error"` with a `workflow_limit_exceeded` block carrying your `limit` and current `active_count`. Pause an agent in the [console](https://console.cliftonapi.com) or delete one with `clifton_delete_agent`, then resume the new one.
 
 ### Timeouts
 
@@ -75,6 +77,19 @@ Creation turns are slower than `clifton_ask` — the commit turn generates and v
 ### Attachments
 
 File attachments from the MCP host are **not** supported. The `attachments` field accepts Clifton Data Vault file IDs only: files already uploaded via the console. Use `clifton_list_vault_files` to find IDs for files the signed-in user can access, then pass those IDs to `clifton_create_agent.attachments` for agent creation or `clifton_ask.attachments` for one-off analysis.
+
+---
+
+## Deleting an agent
+
+`clifton_delete_agent` accepts an `agent_id` and optional `owner_email`. OAuth callers default to the signed-in user. API-key callers must pass an authorized manager's email. Use `clifton_list_agents` first when the user names an agent but does not provide its id.
+
+- Call deletion only after the user clearly asks to delete or remove the agent.
+- If several agents match the request, show the matches and ask the user to choose. Do not guess.
+- Do not interpret requests to pause an agent or stop notifications as deletion.
+- Deletion stops future runs and cannot be undone. Existing reports remain available through the report tools.
+
+The tool returns the deleted `agent_id`, `status: "deleted"`, and `reports_retained: true`.
 
 ---
 

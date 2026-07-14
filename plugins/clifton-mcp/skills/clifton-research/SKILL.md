@@ -1,6 +1,6 @@
 ---
 name: clifton-research
-description: Use Clifton for any markets or finance question — stocks, ETFs, crypto, bonds, options, macro and economic data, SEC filings, earnings, transcripts, analyst ratings, screening, cross-company comparisons, and uploaded Clifton Data Vault files — and for Clifton agents, when the user wants to create, monitor, watch, alert on, or schedule a standing market monitor, or to list their agents and read agent reports. Calls clifton_ask, clifton_list_vault_files, and the clifton agent tools on the bundled clifton MCP server.
+description: Use Clifton for markets and finance questions about stocks, ETFs, crypto, bonds, options, macro data, SEC filings, earnings, transcripts, analyst ratings, screening, company comparisons, and uploaded Clifton Data Vault files. Use it for Clifton agent requests to create, monitor, watch, alert, schedule, list, delete, or remove a standing market monitor, or read agent reports. Calls clifton_ask, clifton_list_vault_files, and the Clifton agent tools on the bundled clifton MCP server.
 ---
 
 # Clifton Research & Agents
@@ -49,6 +49,8 @@ Clifton agents watch markets, filings, transcripts, and news for a condition and
 - The agent exists only when `status` is `enabled` and an `agent_url` or `workflow_id` is returned. Share the link when present.
 
 **Reading** — when the user asks to list, show, or check their agents, or wants an agent's latest report, use `clifton_list_agents`, `clifton_list_agent_reports`, and `clifton_get_agent_report`.
+
+**Deleting:** Call `clifton_delete_agent` only after the user clearly asks to delete or remove an agent. If the user gives a name instead of an id, call `clifton_list_agents` first. Delete the agent when exactly one result clearly matches the request; if several match, show them and ask the user to choose. Never treat “pause,” “disable,” or “stop notifications” as deletion. Tell the user that deletion stops future runs, cannot be undone, and retains existing reports.
 
 ## Connection
 
