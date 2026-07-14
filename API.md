@@ -167,12 +167,12 @@ Five tools for creating, deleting, and reading Clifton agents (standing monitors
 | Tool | Summary | Key input fields |
 |---|---|---|
 | `clifton_create_agent` | Multi-turn agent creation; commits on your confirmation. API-key access requires an organization gate and an authorized `owner_email` | `message` (required), `session_id`, `output_mode` (`chat` \| `models`), `owner_email`* |
-| `clifton_delete_agent` | Delete one agent owned by the signed-in user. Existing reports remain available. **OAuth only** | `agent_id` (required) |
+| `clifton_delete_agent` | Delete one agent owned by an authorized user. Existing reports remain available | `agent_id` (required), `owner_email`* |
 | `clifton_list_agents` | List agents, newest first | `owner_email`*, `limit` (default 10), `offset` |
 | `clifton_list_agent_reports` | List report summaries, newest first | `owner_email`*, `agent_id`, `limit` (default 10), `offset` |
 | `clifton_get_agent_report` | One report: markdown (chat), spreadsheet link (models), or a no-report `reason` | report id, `owner_email`* |
 
-\* `owner_email` defaults to the signed-in user for OAuth callers. Read tools require it for API-key callers and reject cross-organization access. `clifton_create_agent` accepts API-key callers only when Clifton has enabled that organization and the selected owner is an authorized manager.
+\* `owner_email` defaults to the signed-in user for OAuth callers. API-key callers must provide an authorized manager email in the key's organization. `clifton_create_agent` also requires Clifton to enable API-key creation for that organization.
 
 ---
 

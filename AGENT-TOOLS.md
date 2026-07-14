@@ -7,7 +7,7 @@ Five tools:
 | Tool | What it does |
 |---|---|
 | `clifton_create_agent` | Multi-turn conversation that defines and enables a new agent |
-| `clifton_delete_agent` | Delete one agent owned by the signed-in user |
+| `clifton_delete_agent` | Delete one agent owned by an authorized user |
 | `clifton_list_agents` | List your agents (name, status, schedule) |
 | `clifton_list_agent_reports` | List reports your agents have generated |
 | `clifton_get_agent_report` | Fetch one report's content |
@@ -15,7 +15,7 @@ Five tools:
 Authentication ([API.md → Authentication](API.md#authentication)) differs by tool:
 
 - **`clifton_create_agent` accepts OAuth and approved API-key callers.** OAuth callers default to the signed-in user. API-key callers see the tool only when Clifton has enabled API-key creation for their organization; they must pass an `owner_email` for a manager in that organization.
-- **`clifton_delete_agent` requires OAuth sign-in.** The server omits it from API-key tool lists because deletion acts as the signed-in user.
+- **`clifton_delete_agent` accepts OAuth and API keys.** OAuth callers default to the signed-in user. API-key callers must pass an `owner_email` for a manager in their organization.
 - **The three read tools accept either** OAuth or an `X-API-Key` header.
 
 The public schemas are listed at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. Authenticated `tools/list` applies user and organization gates and is authoritative for the caller. If your host does not show these tools, reconnect the Clifton connection. See [TROUBLESHOOTING.md](TROUBLESHOOTING.md#your-host-shows-fewer-or-older-clifton-tools-than-expected-or-rejects-a-tool-argument).
@@ -82,7 +82,7 @@ File attachments from the MCP host are **not** supported. The `attachments` fiel
 
 ## Deleting an agent
 
-`clifton_delete_agent` accepts one `agent_id`. Use `clifton_list_agents` first when the user names an agent but does not provide its id.
+`clifton_delete_agent` accepts an `agent_id` and optional `owner_email`. OAuth callers default to the signed-in user. API-key callers must pass an authorized manager's email. Use `clifton_list_agents` first when the user names an agent but does not provide its id.
 
 - Call deletion only after the user clearly asks to delete or remove the agent.
 - If several agents match the request, show the matches and ask the user to choose. Do not guess.
