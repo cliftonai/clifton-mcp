@@ -162,16 +162,17 @@ OAuth callers default to the signed-in user. API-key callers must pass an `owner
 
 ### Agent tools
 
-Four tools for creating and reading Clifton agents (standing monitors that generate reports when their condition fires). Full guide with examples, the agent limit, `output_mode`, and `owner_email` semantics: [AGENT-TOOLS.md](AGENT-TOOLS.md).
+Five tools for creating, deleting, and reading Clifton agents (standing monitors that generate reports when their condition fires). Full guide with examples, deletion behavior, the agent limit, `output_mode`, and `owner_email` semantics: [AGENT-TOOLS.md](AGENT-TOOLS.md).
 
 | Tool | Summary | Key input fields |
 |---|---|---|
-| `clifton_create_agent` | Multi-turn agent creation; commits on your confirmation. **OAuth only** — not offered to API-key callers | `message` (required), `session_id`, `output_mode` (`chat` \| `models`) |
+| `clifton_create_agent` | Multi-turn agent creation; commits on your confirmation. API-key access requires an organization gate and an authorized `owner_email` | `message` (required), `session_id`, `output_mode` (`chat` \| `models`), `owner_email`* |
+| `clifton_delete_agent` | Delete one agent owned by the signed-in user. Existing reports remain available. **OAuth only** | `agent_id` (required) |
 | `clifton_list_agents` | List agents, newest first | `owner_email`*, `limit` (default 10), `offset` |
 | `clifton_list_agent_reports` | List report summaries, newest first | `owner_email`*, `agent_id`, `limit` (default 10), `offset` |
 | `clifton_get_agent_report` | One report: markdown (chat), spreadsheet link (models), or a no-report `reason` | report id, `owner_email`* |
 
-\* `owner_email` defaults to the signed-in user for OAuth callers; required for API-key callers and must belong to the key's organization. Cross-organization reads are rejected.
+\* `owner_email` defaults to the signed-in user for OAuth callers. Read tools require it for API-key callers and reject cross-organization access. `clifton_create_agent` accepts API-key callers only when Clifton has enabled that organization and the selected owner is an authorized manager.
 
 ---
 
