@@ -39,7 +39,7 @@ Use the section for your host. Most people want the first one.
 
 ---
 
-# Primary — Claude Desktop & Web
+# Claude Desktop & Web
 
 Add Clifton as a **custom connector** over OAuth — no API key. The screenshots use Claude Desktop; Claude Web uses the same connector values.
 
@@ -81,7 +81,7 @@ If Clifton is connected but not available in chat, open the chat **+** menu, cho
 
 ---
 
-# Secondary — ChatGPT Web
+# ChatGPT Web
 
 Custom MCP apps in ChatGPT require **Developer mode**. OpenAI currently documents this for ChatGPT Business and Enterprise/Edu workspaces on ChatGPT web, and the setup path changes often, so treat OpenAI's [Developer mode and MCP apps](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta) guide as authoritative.
 
