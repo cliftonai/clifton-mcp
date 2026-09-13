@@ -7,18 +7,14 @@ Plugin (recommended — OAuth, no key):
 /plugin install clifton-mcp@clifton-mcp
 ```
 
-Manual OAuth — `~/.claude.json`:
+Manual OAuth, with Clifton's required callback port:
 
-```json
-{
-  "mcpServers": {
-    "clifton": {
-      "type": "http",
-      "url": "https://ai.cliftonapi.com/v1/mcp"
-    }
-  }
-}
+```bash
+claude mcp add --transport http --callback-port 8765 \
+  clifton https://ai.cliftonapi.com/v1/mcp
 ```
+
+Run `/mcp` in Claude Code and select Clifton to sign in. Choose either the plugin or the manual server configuration.
 
 Manual API key — `~/.claude.json`:
 

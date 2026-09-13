@@ -1,14 +1,13 @@
-# Codex CLI — config snippet
+# Codex CLI and Desktop — config snippet
 
 API key. `~/.codex/config.toml`:
 
 ```toml
-[features]
-rmcp_client = true   # enables streamable-HTTP MCP servers
-
 [mcp_servers.clifton]
 url = "https://ai.cliftonapi.com/v1/mcp"
 http_headers = { "X-API-Key" = "paste-your-key-here" }
 ```
 
-Full setup: [../INSTALL.md#codex](../INSTALL.md#codex)
+Restart Codex after saving. Current versions need no `rmcp_client` feature flag.
+
+Full setup: [Codex](../INSTALL.md#codex) · [ChatGPT Desktop](../INSTALL.md#chatgpt-desktop). Web setup is separate.
