@@ -94,9 +94,6 @@ Add a **Custom Connector** with URL `https://ai.cliftonapi.com/v1/mcp`. Claude d
 `~/.codex/config.toml`:
 
 ```toml
-[features]
-rmcp_client = true   # required for streamable-HTTP MCP servers
-
 [mcp_servers.clifton]
 url = "https://ai.cliftonapi.com/v1/mcp"
 http_headers = { "X-API-Key" = "paste-your-key-here" }

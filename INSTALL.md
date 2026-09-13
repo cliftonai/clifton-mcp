@@ -1,249 +1,124 @@
-# Connect Clifton over MCP
+# Connect Clifton to your AI app
 
-Clifton's MCP server lets Claude, ChatGPT, and developer CLIs (Claude Code, Cursor, Codex) call `clifton_ask` for markets and finance questions. Connected hosts can also list authorized Clifton Data Vault files and attach them to an ask.
+Use Clifton for markets and finance research, recurring agents, and authorized Data Vault files. You need a [Clifton account](https://console.cliftonapi.com).
 
-OAuth hosts need the MCP URL. API-key hosts need the same URL plus an `X-API-Key` header.
+Every setup uses this MCP server URL:
 
-> Looking for the developer reference (schemas, transport, error codes)? See [API.md](API.md).
+```text
+https://ai.cliftonapi.com/v1/mcp
+```
 
----
+Choose your app. **OAuth** means signing in with your Clifton account in a browser. For an **API key**, create one under **Settings → API keys** in the Clifton console.
 
-## Before you start
+| App | Setup |
+| --- | --- |
+| [Claude Desktop](#claude-desktop) | Custom connector, OAuth |
+| [Claude Web](#claude-web) | Custom connector, OAuth |
+| [ChatGPT Desktop](#chatgpt-desktop) | Streamable HTTP server, API key |
+| [ChatGPT Web](#chatgpt-web) | Developer mode, OAuth; Clifton sign-in needs end-to-end verification |
 
-Choose one auth path:
+Developer tools: [Claude Code](#claude-code), [Codex](#codex), and [Cursor](#cursor).
 
-- **OAuth (browser sign-in, no key):** Claude Desktop, Claude Web, Claude Code (via plugin), and ChatGPT workspaces that support custom MCP apps. Sign in with your Clifton account.
-- **API key (manual config):** Cursor, Codex, or Claude Code without the plugin. Paste an API key into the host's MCP config.
+## Claude Desktop
 
-You'll also need:
+1. Open **Customize → Connectors → + → Add custom connector**. Some versions put **Connectors** under **Settings**.
+2. Enter **Name:** `Clifton` and **Remote MCP server URL:** `https://ai.cliftonapi.com/v1/mcp`. Leave optional OAuth client fields empty.
+3. Add the connector, select **Connect** if prompted, and sign in to Clifton.
+4. In a new chat, open **+ → Connectors**, enable Clifton, and [try a question](#check-the-connection).
 
-1. **A Clifton account** at [console.cliftonapi.com](https://console.cliftonapi.com).
-2. **An API key** — only if you're on the API-key path. Grab it from **Settings → API keys** in your Clifton console.
+**Team / Enterprise:** an owner first adds the connector under **Organization settings → Connectors**. Each member then connects their own Clifton account.
 
----
+[Connector dialog screenshot](assets/screenshots/claude-desktop-add-custom-connector.png) · [Anthropic's setup guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
 
-## Choose your tool
+## Claude Web
 
-| Host | Setup method | Time |
-|---|---|---|
-| **Claude Desktop & Web** | Custom connector + OAuth | < 1 min |
-| **ChatGPT Web** | Developer mode + custom MCP app + OAuth | ~ 2 min |
-| **Claude Code** (CLI) | Plugin (one command, no key — also adds a skill) or API key | < 1 min |
-| **Cursor** | API key + JSON snippet | ~ 2 min |
-| **Codex** (CLI) | API key + TOML snippet | ~ 2 min |
-| **Codex** (Desktop app) | API key + form fields | < 1 min |
+Open [claude.ai](https://claude.ai) and follow the [Claude Desktop steps](#claude-desktop): **Customize → Connectors → + → Add custom connector**, using the same Clifton name, URL, and sign-in.
 
-> **Tool vs. skill:** Every path connects `clifton_ask`. OAuth and API-key paths may also expose `clifton_list_vault_files`. The **Claude Code plugin** installs the `clifton-research` skill, which routes finance questions to Clifton. Connector and API-key paths add MCP tools only.
+If you already connected Clifton in Claude Desktop with the same Claude account, enable it from **+ → Connectors** in your web chat. You do not need to add it again. [Anthropic's desktop and web guide](https://support.claude.com/en/articles/11725091-when-to-use-desktop-and-web-connectors)
 
-Use the section for your host. Most people want the first one.
+## ChatGPT Desktop
 
----
+Use the current desktop app's **MCP servers** settings.
 
-# Claude Desktop & Web
+1. Open **Settings → MCP servers → Add server** (called **Connect to a custom MCP** in some versions).
+2. Select **Streamable HTTP** and enter:
 
-Add Clifton as a **custom connector** over OAuth — no API key. The screenshots use Claude Desktop; Claude Web uses the same connector values.
+   | Field | Value |
+   | --- | --- |
+   | Name | `clifton` |
+   | URL | `https://ai.cliftonapi.com/v1/mcp` |
+   | Header name | `X-API-Key` |
+   | Header value | Your Clifton API key |
 
-> 📖 **Canonical steps:** Anthropic's [Connect to remote MCP servers](https://modelcontextprotocol.io/docs/develop/connect-remote-servers) walkthrough (plain-language version: [Get started with custom connectors](https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp)). If Claude's menus differ from the steps below (the UI moves), follow Anthropic's doc and use Clifton's URL `https://ai.cliftonapi.com/v1/mcp`.
+3. Save and select **Restart**, then [try a question](#check-the-connection).
 
-### 1. Open the connector dialog
+If your app has no MCP server settings, use [ChatGPT Web](#chatgpt-web). If it has no header editor, use the [configuration below](#codex). Clifton uses an HTTP URL, so leave STDIO command fields empty.
 
-- **Individual accounts:** click your name → **Settings** or **Customize** → **Connectors** → **+** → **Add custom connector**.
-- **Team / Enterprise:** an owner adds the connector under **Organization settings → Connectors**. Members then connect it from their own **Connectors** settings.
+The desktop app and Codex CLI share local MCP configuration. Web setup is separate. [OpenAI's MCP guide](https://learn.chatgpt.com/docs/extend/mcp)
 
-![Claude Desktop — Settings with Connectors selected](assets/screenshots/claude-desktop-open-settings.png)
+## ChatGPT Web
 
-Click the **+** button in Connectors, then choose **Add custom connector**.
+Create a custom MCP connection on [chatgpt.com](https://chatgpt.com). Developer mode is available on eligible paid accounts, subject to workspace policy. Clifton's OAuth flow in ChatGPT **has not been verified end to end**.
 
-![Claude Desktop — Connectors panel](assets/screenshots/claude-desktop-connectors-path.png)
+1. Open **Settings → Security and login** and enable **Developer mode**. If unavailable, check your account eligibility or ask your workspace administrator.
+2. Open [Plugins](https://chatgpt.com/plugins) and select **+** to add a developer-mode app.
+3. Enter **Name:** `Clifton`, **Description:** `Markets and finance research`, and **MCP server URL:** `https://ai.cliftonapi.com/v1/mcp`.
+4. Choose **OAuth**. Leave optional client ID and secret empty; if asked for a registration method, choose **Dynamic Client Registration (DCR)**. Create the connection and complete Clifton sign-in when prompted.
+5. In a new chat, choose **+ → Developer mode**, select Clifton, and [try a question](#check-the-connection).
 
-### 2. Add Clifton
+Clifton also offers tools that create or delete agents. Review the selected tools and any action confirmation before proceeding. See [Agent tools](AGENT-TOOLS.md).
 
-In the dialog:
+If sign-in fails, send [support](SUPPORT.md) the error. [OpenAI's Developer mode guide](https://developers.openai.com/api/docs/guides/developer-mode) · [Connection walkthrough](https://developers.openai.com/plugins/deploy/connect-chatgpt)
 
-- **Name:** Clifton
-- **Remote MCP server URL:** `https://ai.cliftonapi.com/v1/mcp`
+## Developer tools
 
-Only those two fields are required. Click **Add**. Claude opens Clifton sign-in — use your `console.cliftonapi.com` credentials.
+### Claude Code
 
-![Claude Desktop — Add custom connector dialog](assets/screenshots/claude-desktop-add-custom-connector.png)
-
-**On the web** (claude.ai), use the same name and URL. The menu may say **Customize → Connectors** instead of **Settings → Connectors**.
-
-### 3. Verify
-
-Start a new chat and ask:
-
-> What tools does Clifton provide?
-
-Pass condition: Claude lists Clifton and asks permission to call `clifton_ask`.
-
-If Clifton is connected but not available in chat, open the chat **+** menu, choose **Connectors**, and enable Clifton for that conversation.
-
----
-
-# ChatGPT Web
-
-Custom MCP apps in ChatGPT require **Developer mode**. OpenAI currently documents this for ChatGPT Business and Enterprise/Edu workspaces on ChatGPT web, and the setup path changes often, so treat OpenAI's [Developer mode and MCP apps](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta) guide as authoritative.
-
-### 1. Enable Developer mode
-
-- **Business:** admins/owners enable Developer mode from **Workspace settings → Apps → Create** or **Settings → Apps → Advanced Settings**.
-- **Enterprise / Edu:** admins grant access; enabled users turn it on under **Settings → Apps → Advanced Settings**.
-- If you do not see **Apps → Create**, your workspace probably does not have Developer mode enabled.
-
-> Developer mode can enable apps with write actions. Clifton includes agent-creation tools, so enable Developer mode deliberately.
-
-### 2. Create the Clifton app
-
-From **Settings → Apps → Create** or **Workspace settings → Apps → Create**, add:
-
-- **Name:** Clifton
-- **MCP server URL:** `https://ai.cliftonapi.com/v1/mcp`
-- **Auth:** OAuth, if prompted
-
-Scan tools or create the app, then sign in with your Clifton account when prompted.
-
-### 3. Use it
-
-In a chat, select Clifton from the **+** / tools menu, or mention the app by name, then ask a markets or finance question.
-
-> The Clifton OAuth handshake inside ChatGPT has not been end-to-end tested yet. If sign-in fails, send [support](SUPPORT.md) the exact error.
-
----
-
-# Developer tools (CLIs)
-
-For terminal / editor workflows. The Claude Code **plugin** bundles the `clifton-research` skill (so Claude defaults to Clifton for finance work); Cursor and Codex connect the bare tool via an API key.
-
-## Claude Code
-
-Use the **Clifton plugin** (OAuth, no key). It installs `clifton_ask` **plus** the `clifton-research` skill — so Claude Code automatically routes markets and finance questions to Clifton (sourced from SEC filings + market data). Cursor, Codex, and the connector paths add the tool only.
+Run these commands inside Claude Code:
 
 ```text
 /plugin marketplace add cliftonai/clifton-mcp
 /plugin install clifton-mcp@clifton-mcp
 ```
 
-The first time you ask a question, Claude Code opens a browser for Clifton sign-in. Then skip to **Your first question** below.
+Restart Claude Code, then use `/mcp` to authenticate Clifton. The plugin includes the `clifton-research` skill, which guides Claude Code to use Clifton for finance questions.
 
-> **OAuth requires the fixed callback port `8765`.** Clifton sign-in only accepts the exact redirect `http://localhost:8765/callback`; a random port is rejected. The plugin ships `oauth.callbackPort: 8765` in its config to pin this. After installing and restarting Claude Code, confirm it took with `claude mcp get clifton` — the output should show `OAuth: callback_port 8765`. If it shows a different or random port, use the manual command below instead.
+The plugin pins the OAuth callback port to `8765`, as required by Clifton sign-in. If authentication fails, follow [OAuth troubleshooting](TROUBLESHOOTING.md#claude-code-oauth-fails-with-redirect_uri-not-permitted--redirect_mismatch).
 
-**Recommended OAuth path (explicit, no skill):** add the server yourself with the port pinned. This is the most reliable way to get OAuth working:
+For manual OAuth or API-key setup, see [Claude Code examples](examples/claude-code.md).
 
-```bash
-claude mcp add --transport http --callback-port 8765 \
-  clifton https://ai.cliftonapi.com/v1/mcp
-```
+### Codex
 
-Then run `/mcp` and choose **clifton** to sign in. The `--callback-port 8765` flag is required — without it Claude Code picks a random port that Clifton's sign-in rejects.
+**Desktop:** use the [ChatGPT Desktop server settings](#chatgpt-desktop).
 
-Prefer an **API key** (no plugin, no skill, no browser)? Create one at **Settings → API keys** in the console, then:
-
-```bash
-export CLIFTON_API_KEY="paste-your-key-here"
-claude mcp add --transport http clifton https://ai.cliftonapi.com/v1/mcp \
-  --header "X-API-Key: $CLIFTON_API_KEY"
-```
-
-Verify any path: ask *"What tools does Clifton provide?"* The response lists `clifton_ask`; eligible OAuth and API-key connections also list `clifton_list_vault_files`.
-
-> Reference: [Connect Claude Code to tools via MCP](https://code.claude.com/docs/en/mcp) — plugin install, `claude mcp add`, `--callback-port`, OAuth via `/mcp`.
-
-## Cursor
-
-Create an API key at **Settings → API keys** in the console, then edit `~/.cursor/mcp.json` (create it if missing):
-
-```json
-{
-  "mcpServers": {
-    "clifton": {
-      "url": "https://ai.cliftonapi.com/v1/mcp",
-      "headers": {
-        "X-API-Key": "paste-your-key-here"
-      }
-    }
-  }
-}
-```
-
-Restart Cursor. (Cursor infers HTTP transport from `url` — no `transport` field needed.)
-
-Verify: in a Cursor chat, ask *"What tools does Clifton provide?"* — it lists `clifton_ask`.
-
-> Reference: [Cursor — Model Context Protocol](https://docs.cursor.com/context/model-context-protocol).
-
-## Codex
-
-Codex has two setup paths depending on whether you're on the CLI or the desktop app. Both write the same config underneath.
-
-### Codex CLI
-
-Create an API key in the console, then add to `~/.codex/config.toml`:
+**CLI or manual desktop configuration:** add this to `~/.codex/config.toml`, replacing the placeholder with your Clifton API key. Update any existing `clifton` entry instead of adding a duplicate.
 
 ```toml
-[features]
-rmcp_client = true   # enables streamable-HTTP MCP servers
-
 [mcp_servers.clifton]
 url = "https://ai.cliftonapi.com/v1/mcp"
 http_headers = { "X-API-Key" = "paste-your-key-here" }
 ```
 
-> The table is `mcp_servers` (not `mcp`). Streamable-HTTP MCP requires the RMCP client — `[features].rmcp_client = true` (older builds: `experimental_use_rmcp_client = true` at the top level). Without it Codex expects a stdio `command` and fails with `missing field command`. With the flag, Codex sends `http_headers` natively, so no `transport` field or `mcp-remote` bridge is needed.
+Restart Codex. Use `/mcp` to check that Clifton is connected, then [try a question](#check-the-connection). Current versions need no `rmcp_client` feature flag. [OpenAI's configuration reference](https://learn.chatgpt.com/docs/extend/mcp#streamable-http-servers)
 
-Restart Codex and ask *"What tools does Clifton provide?"*
+**Web / cloud:** [Codex cloud](https://learn.chatgpt.com/docs/cloud) uses separate repository environments. This guide has no verified Clifton setup for those tasks yet; use [ChatGPT Web](#chatgpt-web) for browser-based research.
 
-### Codex Desktop app
+### Cursor
 
-Create an API key in the console, then find the **Connect to a custom MCP** screen in Codex's settings (menu path varies by build).
+Add Clifton's URL and API-key header to `~/.cursor/mcp.json` using the [Cursor example](examples/cursor.md). Restart Cursor, then [try a question](#check-the-connection).
 
-The form defaults to the **STDIO** tab (for locally-launched command-line servers). Switch to the **Streamable HTTP** tab first — Clifton is a remote server, not a local command, so the STDIO fields (Command to launch, Arguments, Working directory) don't apply and won't work.
+## Check the connection
 
-On the Streamable HTTP tab, fill in:
+Start a new chat and ask:
 
-| Field | Value |
-|---|---|
-| Name | `clifton` |
-| URL | `https://ai.cliftonapi.com/v1/mcp` |
-| Header | `X-API-Key: paste-your-key-here` |
+> Use Clifton to find NVIDIA's most recent reported quarterly revenue and cite the source.
 
-Save, then ask *"What tools does Clifton provide?"*
+Check that the app actually calls **`clifton_ask`** and returns a sourced answer. A response that merely lists tool names does not prove the connection works.
 
----
+Available tools depend on your account and authentication method. See [API.md](API.md) for research, agent, and Data Vault tools.
 
-## Your first question
+## Manage access and get help
 
-Try one of these:
-
-- *Why is NVDA moving today?*
-- *How many cars did Tesla sell last quarter?*
-- *Did AAPL add any new risk factors in its latest 10-K versus last year?*
-- *What did NVDA say about AI capex on its last earnings call?*
-
-Clifton cites the filings, transcripts, releases, or market data it used.
-
-> Tip: answers take roughly 20–40 seconds. Quick lookups, such as a ticker definition or one reported metric, are faster.
-
----
-
-## Manage access
-
-- **Disconnect OAuth:** remove Clifton from the host's MCP / connector settings.
-- **Rotate API key:** create a new key in the Clifton console, update the host config, then delete the old key.
-- **Uninstall Claude Code plugin:** run `/plugin uninstall clifton-mcp@clifton-mcp`.
-
----
-
-## Get help
-
-See [SUPPORT.md](SUPPORT.md) for support contacts, or:
-
-- **Setup not working?** Email `support@cliftonai.com` with `[MCP]` in the subject.
-- **Found a bug or unexpected behavior?** Include the host, the question you asked, a screenshot if possible, and the approximate request time.
-
----
-
-## What's next
-
-- Future tools will appear in `tools/list` and `https://ai.cliftonapi.com/.well-known/mcp-tools.json` when enabled.
-- Mobile support depends on Anthropic Connectors Directory availability.
+- **Disconnect:** remove Clifton in your app's connector or MCP settings.
+- **Rotate a key:** create a replacement in Clifton, update the app, then delete the old key.
+- **Trouble connecting:** see [Troubleshooting](TROUBLESHOOTING.md) or [Support](SUPPORT.md). Include your app, the exact error, and the request ID if shown. Never include an API key.

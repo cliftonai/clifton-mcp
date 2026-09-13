@@ -7,4 +7,4 @@ OAuth — no API key. Add a custom connector:
 
 Only those two fields are required.
 
-Full setup: [../INSTALL.md#primary--claude-desktop--web](../INSTALL.md#primary--claude-desktop--web)
+Full setup: [Claude Web](../INSTALL.md#claude-web)
