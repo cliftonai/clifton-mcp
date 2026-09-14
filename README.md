@@ -16,13 +16,13 @@ Clifton exposes MCP tools for markets and finance research, Data Vault file disc
 
 ### Claude Desktop, Claude Web, ChatGPT Desktop, ChatGPT Web
 
-In Claude Desktop or Web, add a custom connector. ChatGPT Desktop supports OAuth, but Clifton's sign-in currently has a callback compatibility issue; use the API-key setup in [INSTALL.md](INSTALL.md#chatgpt-desktop). In ChatGPT Web, create a custom MCP connection in Developer mode. Use this server URL:
+In Claude Desktop or Web, add a custom connector. In ChatGPT Desktop, add an HTTP MCP server and select **Authenticate**. In ChatGPT Web, create a custom MCP connection in Developer mode. Use this server URL:
 
 ```text
 https://ai.cliftonapi.com/v1/mcp
 ```
 
-Sign in with your Clifton account for OAuth connections. ChatGPT Web requires an eligible account and workspace permission; the Clifton OAuth flow has not been verified end to end there yet.
+Sign in with your Clifton account for OAuth connections. ChatGPT Web requires an eligible account and workspace permission.
 
 **Step-by-step setup for each host →** [INSTALL.md](INSTALL.md)
 
