@@ -20,9 +20,7 @@ The public `tools/list` snapshot is published at `https://ai.cliftonapi.com/.wel
 
 ## Authentication
 
-Use OAuth for Claude Code plugin installs, Claude Web, Claude Desktop, and eligible ChatGPT Web accounts; the ChatGPT Web flow remains unverified against Clifton. ChatGPT Desktop and Codex also support OAuth, but a current Codex-client login check against Clifton fails with `redirect_mismatch`. Use an API key while that compatibility issue remains. See [OAuth troubleshooting](TROUBLESHOOTING.md#chatgpt-desktop-or-codex-oauth-returns-redirect_mismatch).
-
-API-key setup is also available for manual Claude Code, Cursor, and other hosts that support custom HTTP headers.
+Clifton accepts OAuth bearer tokens and API keys. Follow the per-host instructions in [INSTALL.md](INSTALL.md) for your app's setup.
 
 ### API key (Claude Code manual, Cursor, Codex)
 
@@ -30,7 +28,7 @@ Header: `X-API-Key: <your-api-key>`
 
 API keys are organization-scoped; the org's existing chat-session entitlements apply. Issue keys from the [Clifton console](https://console.cliftonapi.com).
 
-### OAuth 2.1 (Claude Code plugin, Claude Web, Claude Desktop, ChatGPT)
+### OAuth 2.1 (Claude, ChatGPT, and Codex)
 
 Standard OAuth 2.1 with PKCE. Clifton's authorization endpoints support Dynamic Client Registration, so MCP clients can register and exchange tokens without manual Client ID entry.
 
@@ -198,7 +196,7 @@ These notes describe current server behavior and are **not part of the contract*
 | Tool not found on `tools/call` (`METHOD_NOT_FOUND`) | Tool not in the currently-enabled set. | Confirm via `tools/list`; only currently-enabled tools respond. |
 | OAuth completes but `tools/call` returns 401 | The access token's identity claim could not be resolved. | Re-run sign-in; if persistent, contact support with the trace details. |
 | `Automatic client registration isn't supported` in Claude Web | Client tried DCR against the wrong endpoint. | Update the connector URL to `https://ai.cliftonapi.com/v1/mcp`; the DCR shim handles registration. |
-| Connector "redirect_mismatch" during OAuth | The host's OAuth callback URL is not pre-registered. | Major Claude / OpenAI / Cursor callbacks are already registered. For other hosts, contact support to add the callback URL. |
+| Connector "redirect_mismatch" during OAuth | The sign-in callback was rejected. | Reconnect Clifton. If it persists, contact support with your app name and the error text. |
 
 For unresolved issues, include the `X-Request-Id` from the failing response and the host you were using.
 

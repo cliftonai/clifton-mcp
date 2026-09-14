@@ -8,28 +8,11 @@ Checks for common MCP setup failures. For protocol-level errors, see the **Troub
 
 The OAuth sign-in handshake between the host and Clifton didn't complete. Confirm the connector URL is exactly `https://ai.cliftonapi.com/v1/mcp` and retry — this is sometimes transient. If it persists, it's more likely a Clifton-side issue than your setup: contact [support](SUPPORT.md) with the host you're using and the reference id shown in the error (e.g. `ofid_…`).
 
-### Claude Code OAuth fails with `redirect_uri not permitted` / `redirect_mismatch`
+### OAuth sign-in does not complete
 
-Claude Code's loopback callback port didn't match the one Clifton's sign-in expects. Clifton requires the exact redirect `http://localhost:8765/callback`; by default Claude Code picks a random port (you'll see something like `http://localhost:61674/callback` in the browser URL), which is rejected.
+Confirm the server URL is `https://ai.cliftonapi.com/v1/mcp`, then disconnect Clifton and reconnect. Complete sign-in in the browser and return to your app.
 
-- **Plugin path:** the plugin ships a pinned port. Confirm it applied with `claude mcp get clifton` — it should show `OAuth: callback_port 8765`. If it doesn't (or shows a random port), use the manual command below instead of the plugin's server.
-- **Manual `claude mcp add` path:** you added the server without the fixed port. Remove and re-add it with the flag, then re-authenticate:
-
-  ```bash
-  claude mcp remove clifton
-  claude mcp add --transport http --callback-port 8765 \
-    clifton https://ai.cliftonapi.com/v1/mcp
-  ```
-
-  Run `/mcp` to sign in. A random port in the browser URL means the port wasn't pinned.
-
-### ChatGPT Desktop or Codex OAuth returns `redirect_mismatch`
-
-ChatGPT Desktop and Codex support OAuth. Clifton's sign-in service currently accepts specific callback URLs, while the Codex OAuth client sends a different URL. A live Codex-client check reached Clifton and failed before sign-in with `redirect_mismatch`; the desktop UI flow has not been verified end to end.
-
-The callback URL is the address the browser returns to after sign-in. Codex adds a server-specific path after `/callback`; Clifton's registered local URLs end at `/callback` on port `8765`. Pinning that port still failed because the extra path remained.
-
-Use the [API-key setup](INSTALL.md#chatgpt-desktop) while Clifton's callback compatibility is corrected. Report the error and client version to [support](SUPPORT.md).
+For Claude Code, use `/mcp` to authenticate. For Codex CLI, run `codex mcp login clifton`. If the error persists, contact [support](SUPPORT.md) with your app name and the error text. Do not send credentials or the full sign-in URL.
 
 ### Tool call returns `401 Unauthorized`
 

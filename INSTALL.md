@@ -14,8 +14,8 @@ Choose your app. **OAuth** means signing in with your Clifton account in a brows
 | --- | --- |
 | [Claude Desktop](#claude-desktop) | Custom connector, OAuth |
 | [Claude Web](#claude-web) | Custom connector, OAuth |
-| [ChatGPT Desktop](#chatgpt-desktop) | OAuth supported; use an API key until Clifton sign-in is verified |
-| [ChatGPT Web](#chatgpt-web) | Developer mode, OAuth; Clifton sign-in needs end-to-end verification |
+| [ChatGPT Desktop](#chatgpt-desktop) | Streamable HTTP, OAuth |
+| [ChatGPT Web](#chatgpt-web) | Developer mode, OAuth |
 
 Developer tools: [Claude Code](#claude-code), [Codex](#codex), and [Cursor](#cursor).
 
@@ -38,31 +38,18 @@ If you already connected Clifton in Claude Desktop with the same Claude account,
 
 ## ChatGPT Desktop
 
-**ChatGPT Desktop supports OAuth**, with an **Authenticate** button in its MCP server settings. [OpenAI's MCP guide](https://learn.chatgpt.com/docs/extend/mcp)
-
-Clifton's OAuth sign-in needs a compatibility fix: a live check using the shared Codex client stopped with `redirect_mismatch`. Use the API-key setup below until Clifton OAuth is verified in the desktop app. See [OAuth troubleshooting](TROUBLESHOOTING.md#chatgpt-desktop-or-codex-oauth-returns-redirect_mismatch).
-
-**API-key setup:**
-
 1. Open **Settings → MCP servers → Add server** (called **Connect to a custom MCP** in some versions).
-2. Select **Streamable HTTP** and enter:
+2. Select **Streamable HTTP**. Enter **Name:** `clifton` and **URL:** `https://ai.cliftonapi.com/v1/mcp`. Leave API-key headers and optional OAuth client fields empty.
+3. Save, select **Authenticate**, and sign in with your Clifton account in the browser.
+4. Return to the app, select **Restart** if prompted, and [try a question](#check-the-connection).
 
-   | Field | Value |
-   | --- | --- |
-   | Name | `clifton` |
-   | URL | `https://ai.cliftonapi.com/v1/mcp` |
-   | Header name | `X-API-Key` |
-   | Header value | Your Clifton API key |
+**API-key alternative:** add the `X-API-Key` header with your Clifton API key instead of authenticating with OAuth. If your app has no header editor, use the [configuration example](examples/codex.md#api-key).
 
-3. Save and select **Restart**, then [try a question](#check-the-connection).
-
-If your app has no MCP server settings, use [ChatGPT Web](#chatgpt-web). If it has no header editor, use the [configuration below](#codex). Clifton uses an HTTP URL, so leave STDIO command fields empty.
-
-The desktop app and Codex CLI share local MCP configuration. Web setup is separate.
+If your app has no MCP server settings, use [ChatGPT Web](#chatgpt-web). Clifton uses an HTTP URL, so leave STDIO command fields empty. The desktop app and Codex CLI share local MCP configuration; Web setup is separate. [OpenAI's MCP guide](https://learn.chatgpt.com/docs/extend/mcp)
 
 ## ChatGPT Web
 
-Create a custom MCP connection on [chatgpt.com](https://chatgpt.com). Developer mode is available on eligible paid accounts, subject to workspace policy. Clifton's OAuth flow in ChatGPT **has not been verified end to end**.
+Create a custom MCP connection on [chatgpt.com](https://chatgpt.com). Developer mode is available on eligible paid accounts, subject to workspace policy.
 
 1. Open **Settings → Security and login** and enable **Developer mode**. If unavailable, check your account eligibility or ask your workspace administrator.
 2. Open [Plugins](https://chatgpt.com/plugins) and select **+** to add a developer-mode app.
@@ -87,7 +74,7 @@ Run these commands inside Claude Code:
 
 Restart Claude Code, then use `/mcp` to authenticate Clifton. The plugin includes the `clifton-research` skill, which guides Claude Code to use Clifton for finance questions.
 
-The plugin pins the OAuth callback port to `8765`, as required by Clifton sign-in. If authentication fails, follow [OAuth troubleshooting](TROUBLESHOOTING.md#claude-code-oauth-fails-with-redirect_uri-not-permitted--redirect_mismatch).
+If authentication fails, follow [OAuth troubleshooting](TROUBLESHOOTING.md#oauth-sign-in-does-not-complete).
 
 For manual OAuth or API-key setup, see [Claude Code examples](examples/claude-code.md).
 
@@ -95,17 +82,18 @@ For manual OAuth or API-key setup, see [Claude Code examples](examples/claude-co
 
 **Desktop:** use the [ChatGPT Desktop server settings](#chatgpt-desktop).
 
-**CLI or manual desktop configuration:** add this to `~/.codex/config.toml`, replacing the placeholder with your Clifton API key. Update any existing `clifton` entry instead of adding a duplicate.
+**CLI:** add the server and sign in:
 
-```toml
-[mcp_servers.clifton]
-url = "https://ai.cliftonapi.com/v1/mcp"
-http_headers = { "X-API-Key" = "paste-your-key-here" }
+```bash
+codex mcp add clifton --url https://ai.cliftonapi.com/v1/mcp
+codex mcp login clifton
 ```
 
-Restart Codex. Use `/mcp` to check that Clifton is connected, then [try a question](#check-the-connection). Current versions need no `rmcp_client` feature flag. [OpenAI's configuration reference](https://learn.chatgpt.com/docs/extend/mcp#streamable-http-servers)
+Complete Clifton sign-in in the browser. Restart Codex, use `/mcp` to check the connection, then [try a question](#check-the-connection). If Clifton is already configured, update its existing entry instead of adding a duplicate.
 
-**Web / cloud:** [Codex cloud](https://learn.chatgpt.com/docs/cloud) uses separate repository environments. This guide has no verified Clifton setup for those tasks yet; use [ChatGPT Web](#chatgpt-web) for browser-based research.
+For manual configuration or an API key, see the [Codex examples](examples/codex.md). Current versions need no `rmcp_client` feature flag.
+
+**Web / cloud:** [Codex cloud](https://learn.chatgpt.com/docs/cloud) uses separate repository environments. For browser-based research, follow [ChatGPT Web](#chatgpt-web).
 
 ### Cursor
 

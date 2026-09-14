@@ -1,6 +1,6 @@
 # ChatGPT Web — connection settings
 
-OAuth, no API key. **Clifton sign-in has not been verified end to end.** Enable Developer mode under **Settings → Security and login**, then use **Plugins → +** to create a connection:
+OAuth, no API key. Enable Developer mode under **Settings → Security and login**, then use **Plugins → +** to create a connection:
 
 - **Name:** `Clifton`
 - **MCP server URL:** `https://ai.cliftonapi.com/v1/mcp`

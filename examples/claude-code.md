@@ -7,10 +7,10 @@ Plugin (recommended — OAuth, no key):
 /plugin install clifton-mcp@clifton-mcp
 ```
 
-Manual OAuth, with Clifton's required callback port:
+Manual OAuth:
 
 ```bash
-claude mcp add --transport http --callback-port 8765 \
+claude mcp add --transport http \
   clifton https://ai.cliftonapi.com/v1/mcp
 ```
 
