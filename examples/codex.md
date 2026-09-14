@@ -1,6 +1,8 @@
 # Codex CLI and Desktop — config snippet
 
-API key. `~/.codex/config.toml`:
+Codex supports OAuth, but Clifton sign-in currently fails with `redirect_mismatch` in a live client check. Use this API-key configuration until that issue is resolved. [OAuth troubleshooting](../TROUBLESHOOTING.md#chatgpt-desktop-or-codex-oauth-returns-redirect_mismatch)
+
+`~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.clifton]

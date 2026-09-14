@@ -20,7 +20,9 @@ The public `tools/list` snapshot is published at `https://ai.cliftonapi.com/.wel
 
 ## Authentication
 
-Use OAuth for Claude Code plugin installs, Claude Web, Claude Desktop, and supported ChatGPT workspaces. Use an API key for Claude Code manual setup, Cursor, Codex, or custom hosts that cannot run OAuth/DCR.
+Use OAuth for Claude Code plugin installs, Claude Web, Claude Desktop, and eligible ChatGPT Web accounts; the ChatGPT Web flow remains unverified against Clifton. ChatGPT Desktop and Codex also support OAuth, but a current Codex-client login check against Clifton fails with `redirect_mismatch`. Use an API key while that compatibility issue remains. See [OAuth troubleshooting](TROUBLESHOOTING.md#chatgpt-desktop-or-codex-oauth-returns-redirect_mismatch).
+
+API-key setup is also available for manual Claude Code, Cursor, and other hosts that support custom HTTP headers.
 
 ### API key (Claude Code manual, Cursor, Codex)
 
