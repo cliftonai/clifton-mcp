@@ -6,7 +6,7 @@ API key. `~/.cursor/mcp.json`:
 {
   "mcpServers": {
     "clifton": {
-      "url": "https://ai.cliftonapi.com/v1/mcp",
+      "url": "https://ai.cliftonapi.com/v2/mcp",
       "headers": {
         "X-API-Key": "paste-your-key-here"
       }

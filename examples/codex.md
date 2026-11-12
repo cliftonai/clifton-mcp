@@ -5,7 +5,7 @@
 Add Clifton and sign in:
 
 ```bash
-codex mcp add clifton --url https://ai.cliftonapi.com/v1/mcp
+codex mcp add clifton --url https://ai.cliftonapi.com/v2/mcp
 codex mcp login clifton
 ```
 
@@ -13,7 +13,7 @@ For manual configuration, add this to `~/.codex/config.toml`, then run `codex mc
 
 ```toml
 [mcp_servers.clifton]
-url = "https://ai.cliftonapi.com/v1/mcp"
+url = "https://ai.cliftonapi.com/v2/mcp"
 ```
 
 Update an existing `clifton` entry instead of adding a duplicate.
@@ -24,7 +24,7 @@ To use a Clifton API key, add the header to the same entry:
 
 ```toml
 [mcp_servers.clifton]
-url = "https://ai.cliftonapi.com/v1/mcp"
+url = "https://ai.cliftonapi.com/v2/mcp"
 http_headers = { "X-API-Key" = "paste-your-key-here" }
 ```
 

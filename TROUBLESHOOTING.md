@@ -6,11 +6,11 @@ Checks for common MCP setup failures. For protocol-level errors, see the **Troub
 
 ### "Couldn't register with the sign-in service"
 
-The OAuth sign-in handshake between the host and Clifton didn't complete. Confirm the connector URL is exactly `https://ai.cliftonapi.com/v1/mcp` and retry — this is sometimes transient. If it persists, it's more likely a Clifton-side issue than your setup: contact [support](SUPPORT.md) with the host you're using and the reference id shown in the error (e.g. `ofid_…`).
+The OAuth sign-in handshake between the host and Clifton didn't complete. Confirm the connector URL is exactly `https://ai.cliftonapi.com/v2/mcp` and retry — this is sometimes transient. If it persists, it's more likely a Clifton-side issue than your setup: contact [support](SUPPORT.md) with the host you're using and the reference id shown in the error (e.g. `ofid_…`).
 
 ### OAuth sign-in does not complete
 
-Confirm the server URL is `https://ai.cliftonapi.com/v1/mcp`, then disconnect Clifton and reconnect. Complete sign-in in the browser and return to your app.
+Confirm the server URL is `https://ai.cliftonapi.com/v2/mcp`, then disconnect Clifton and reconnect. Complete sign-in in the browser and return to your app.
 
 For Claude Code, use `/mcp` to authenticate. For Codex CLI, run `codex mcp login clifton`. If the error persists, contact [support](SUPPORT.md) with your app name and the error text. Do not send credentials or the full sign-in URL.
 
@@ -18,9 +18,15 @@ For Claude Code, use `/mcp` to authenticate. For Codex CLI, run `codex mcp login
 
 The API key is invalid, or the OAuth session expired. Create a new key in the [Clifton console](https://console.cliftonapi.com), or re-authenticate through the host's MCP connection flow.
 
-### `clifton_ask` returns `clifton_ask_timeout`
+### The connection says an upgrade is required
 
-The question needed more time than the client-safe budget allows. The response includes a Clifton-console link — open it to continue the question there — or ask a narrower question. If you contact support, quote the `request_id` from the response.
+Change its URL from `/v1/mcp` to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh its tools. Plugin users should update `clifton-mcp` and restart or reconnect it. Do not add duplicate Clifton connections.
+
+### The request says it is running
+
+This is an acknowledgement, not the final answer. Your host should call `clifton_get_response` with the returned session and message IDs. The tool waits server-side for up to ten seconds; repeat while the status remains `running`. A question or pause needs action, so stop polling and follow the returned instructions.
+
+If the initial acknowledgement itself was lost, do not automatically submit the question again. Report the uncertain outcome and request reference instead; a fresh submission can create another task and charge.
 
 ### Your host shows fewer or older Clifton tools than expected, or rejects a tool argument
 

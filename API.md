@@ -8,7 +8,7 @@ Technical reference for connecting an MCP host to Clifton. Use this for Claude C
 
 ## Endpoint
 
-`https://ai.cliftonapi.com/v1/mcp`
+`https://ai.cliftonapi.com/v2/mcp`
 
 - **Transport:** Streamable HTTP (MCP `2025-06-18`; `2025-03-26` accepted for client back-compat).
 - **Protocol:** JSON-RPC 2.0 single-request per POST. Batch arrays are **not** supported.
@@ -62,13 +62,13 @@ No API key is required. The plugin ships the Clifton MCP server config, and Clau
 **Or, manual with an API key:**
 
 ```bash
-claude mcp add --transport http clifton https://ai.cliftonapi.com/v1/mcp \
+claude mcp add --transport http clifton https://ai.cliftonapi.com/v2/mcp \
   --header "X-API-Key: $CLIFTON_API_KEY"
 ```
 
 ### Claude Web / Claude Desktop (OAuth)
 
-Add a **Custom Connector** with URL `https://ai.cliftonapi.com/v1/mcp`. Claude discovers the authorization server via the protected-resource metadata, registers itself via DCR, and runs the OAuth flow. The host opens Clifton sign-in when authorization is required.
+Add a **Custom Connector** with URL `https://ai.cliftonapi.com/v2/mcp`. Claude discovers the authorization server via the protected-resource metadata, registers itself via DCR, and runs the OAuth flow. The host opens Clifton sign-in when authorization is required.
 
 > If you're using a Team workspace, Custom Connectors are managed under **Organization settings → Connectors**, not personal Customize. Only the org owner can add connectors for a Team.
 
@@ -80,7 +80,7 @@ Add a **Custom Connector** with URL `https://ai.cliftonapi.com/v1/mcp`. Claude d
 {
   "mcpServers": {
     "clifton": {
-      "url": "https://ai.cliftonapi.com/v1/mcp",
+      "url": "https://ai.cliftonapi.com/v2/mcp",
       "headers": {
         "X-API-Key": "paste-your-key-here"
       }
@@ -95,7 +95,7 @@ Add a **Custom Connector** with URL `https://ai.cliftonapi.com/v1/mcp`. Claude d
 
 ```toml
 [mcp_servers.clifton]
-url = "https://ai.cliftonapi.com/v1/mcp"
+url = "https://ai.cliftonapi.com/v2/mcp"
 http_headers = { "X-API-Key" = "paste-your-key-here" }
 ```
 
@@ -105,30 +105,55 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 
 > **Tool contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json` lists public tools. Authenticated `tools/list` applies user and organization gates and is authoritative for the caller. The summary below is non-authoritative and may lag the live contract.
 
-### `clifton_ask` *(read-only)*
+### `clifton_ask` *(starts one answer)*
 
-Questions about markets and finance — public companies, tickers, sectors, indexes, ETFs, crypto, bonds, options, and macro/economic data — plus filings, earnings, news, and financial metrics. Use it for extraction, comparison, calculation, and explanations with citations.
+Submit a markets or finance question. Clifton saves the turn before returning its real session/message identifiers. The answer continues after this MCP response closes. Do not treat the acknowledgement as the answer.
 
-**Input**
+| Input | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `message` | string | yes | Question or task. |
+| `effort` | `instant` or `research` | no | Defaults to Instant. Research requires OAuth and server activation for the caller. |
+| `session_id` | string | no | Exact returned session ID for a follow-up; omit on the first call. |
+| `message_id` | string | resume only | Exact returned message ID when answering `needs_input` or resuming `paused`. Omit for an ordinary new follow-up. |
+| `response_format` | object | no | Feature-gated JSON Schema envelope. Resend on a continuation that requires structured output. |
+| `data_sources` | string[] | no | Selected sources. |
+| `attachments` | string[] | no | Authorized Clifton Data Vault file IDs found with `clifton_list_vault_files`. |
+| `context` | object | no | Host context; never identity or authority. |
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `message` | string | yes | The question or task. |
-| `session_id` | string | no | Echo back from a prior response to continue a conversation. |
-| `incognito` | boolean | no | Skip persistence. |
-| `data_sources` | string[] | no | Restrict retrieval to a subset of sources. |
-| `attachments` | string[] | no | Clifton Data Vault file IDs to include. Use `clifton_list_vault_files` to find accessible IDs. |
-| `context` | object | no | Host-supplied metadata. |
+MCP v2 does not accept `incognito`. Unknown or foreign session identifiers are not permission to read another conversation.
 
-**Output**
+A successful acknowledgement has `structuredContent`:
 
-| Field | Type | Notes |
-|---|---|---|
-| `content[].text` | string | Plain-text answer with citation markup stripped, ready to display. |
-| `structuredContent.answer` | string | Raw answer with inline `<citation>` markup preserved. |
-| `structuredContent.citations` | array | Parsed citation objects (`url`, `text`, `snippet`). |
-| `structuredContent.session_id` | string \| null | Server-acknowledged session id. Echo to continue. |
-| `structuredContent.request_id` | string | Present on errors. Identifies the call in Clifton's logs; quote it when contacting support. |
+```json
+{
+  "session_id": "server-issued-session-id",
+  "message_id": "server-issued-message-id",
+  "status": "running",
+  "complete": false,
+  "poll_after_seconds": 10,
+  "request_id": "support-correlation-id"
+}
+```
+
+Use only returned identifiers. If the connection fails before you receive them, report an uncertain outcome with the request reference when available. **Do not invent IDs or automatically resubmit the question:** a new ask can create a second task and charge.
+
+### `clifton_get_response` *(read-only)*
+
+Pass the exact `session_id` and `message_id` from the acknowledgement. The same authenticated user and organization, or the same API-key identity, must fetch the result. Another user or key in the same organization cannot read it through this tool.
+
+Call the tool immediately after acknowledgement. A running poll waits server-side for up to ten seconds, so the host does not need a sleep tool or an additional delay. Polling never starts, resumes, or charges for another answer.
+
+| `status` | `complete` | What the host does |
+| --- | --- | --- |
+| `running` | false | Call `clifton_get_response` again with the same IDs. |
+| `completed` | true | Use the saved answer. |
+| `needs_input` | false | Stop polling; relay `question` and answer it using `clifton_ask` with the same IDs and effort. |
+| `paused` | false | Stop polling; explicitly resume with `clifton_ask` using the same IDs and effort. |
+| `failed`, `expired`, `stopped` | true | Stop polling and report the outcome. |
+
+Completed responses include plain text in `content[].text`, raw `structuredContent.answer`, parsed `citations`, and optional `result` for structured output and `attachments` for produced files. Public source disclosures remain separate text blocks. While running, there is no final answer yet; token-by-token partial text is not returned.
+
+Errors set `isError` and include `error.code`, `class`, and `retryable` in the first JSON content block. Errors with a saved terminal state also include the typed `structuredContent`; errors without a valid saved handle omit it. Missing, deleted, or inaccessible turns produce `response_not_found`; do not interpret that as permission to resubmit. `execution_outcome_unknown` means the invocation ended without a saved terminal result. A storage-limit failure is explicit and never presented as a complete answer or valid JSON result. Database read failures remain retryable polling errors.
 
 ### `clifton_list_vault_files` *(read-only)*
 
@@ -173,16 +198,15 @@ Five tools for creating, deleting, and reading Clifton agents (standing monitors
 
 ---
 
-## Operational Notes (Not Contract)
+## Execution and limits
 
-These notes describe current server behavior and are **not part of the contract**. Check the well-known endpoint and server changelog for contract changes.
-
-- **Single tier.** `clifton_ask` runs one retrieval tier; there is no tier or mode argument to set. (A longer research tier may return in a later version.)
-- **Latency.** Typically 20–40 seconds; quick lookups (a ticker, one reported metric) are faster. A question that needs more than the instant tier comes back promptly with a continue-in-console link rather than running longer.
-- **MCP-client-safe time budget.** A call that can't finish within the budget returns `clifton_ask_timeout` with a link to continue the question in the Clifton console and a `request_id` for support.
-- **Per-org chat quota** applies to `clifton_ask` (same path as the Clifton web console's chat).
-- **No batch JSON-RPC arrays** — one request per POST.
-- **No partial answer chunks** in `tools/call` responses; the answer arrives as one completed result.
+- `effort` selects the existing Instant or Research model. Research remains gated; discover the schema and eligibility through authenticated `tools/list`.
+- MCP does not impose its former short model execution cap. The selected model's normal time/cost limits, available credit, cumulative message budget, and Router invocation deadline still apply.
+- Acknowledgement and final completion are separate. Losing the host connection after acknowledgement does not itself stop the Router's retained execution.
+- Questions and pauses require action; polling alone cannot finish them. A resume preserves the original message's cumulative budget.
+- The per-organization chat quota still applies to submissions. Response reads do not reserve or pay for a new answer.
+- Keep the response-reading tool available while disabling new submissions so accepted work can drain.
+- JSON-RPC batch arrays are not supported.
 
 ---
 
@@ -191,11 +215,11 @@ These notes describe current server behavior and are **not part of the contract*
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `401 Unauthorized` immediately on any RPC | Missing or wrong `X-API-Key` / `Authorization` header. | Verify the key is current; for OAuth, complete the auth flow before issuing tool calls. |
-| `404 Not Found` on `POST /v1/mcp` | Endpoint disabled for this host. | Confirm the URL is `https://ai.cliftonapi.com/v1/mcp`; contact support if it 404s. |
-| `tools/call` returns `clifton_ask_timeout` | The question needed more time than the MCP-client-safe budget allows. | Open the Clifton-console link in the response to continue it there, or narrow the question. Quote the `request_id` if you contact support. |
+| `mcp_upgrade_required` from the old endpoint | The connection uses `/v1/mcp`. | Update it to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh tools. |
+| A submission returns `status: running` | The request is accepted and saved. | Poll `clifton_get_response` using its exact session and message IDs. |
 | Tool not found on `tools/call` (`METHOD_NOT_FOUND`) | Tool not in the currently-enabled set. | Confirm via `tools/list`; only currently-enabled tools respond. |
 | OAuth completes but `tools/call` returns 401 | The access token's identity claim could not be resolved. | Re-run sign-in; if persistent, contact support with the trace details. |
-| `Automatic client registration isn't supported` in Claude Web | Client tried DCR against the wrong endpoint. | Update the connector URL to `https://ai.cliftonapi.com/v1/mcp`; the DCR shim handles registration. |
+| `Automatic client registration isn't supported` in Claude Web | Client tried DCR against the wrong endpoint. | Update the connector URL to `https://ai.cliftonapi.com/v2/mcp`; the DCR shim handles registration. |
 | Connector "redirect_mismatch" during OAuth | The sign-in callback was rejected. | Reconnect Clifton. If it persists, contact support with your app name and the error text. |
 
 For unresolved issues, include the `X-Request-Id` from the failing response and the host you were using.

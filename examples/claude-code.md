@@ -11,7 +11,7 @@ Manual OAuth:
 
 ```bash
 claude mcp add --transport http \
-  clifton https://ai.cliftonapi.com/v1/mcp
+  clifton https://ai.cliftonapi.com/v2/mcp
 ```
 
 Run `/mcp` in Claude Code and select Clifton to sign in. Choose either the plugin or the manual server configuration.
@@ -23,7 +23,7 @@ Manual API key — `~/.claude.json`:
   "mcpServers": {
     "clifton": {
       "type": "http",
-      "url": "https://ai.cliftonapi.com/v1/mcp",
+      "url": "https://ai.cliftonapi.com/v2/mcp",
       "headers": { "X-API-Key": "paste-your-key-here" }
     }
   }

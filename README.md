@@ -1,7 +1,7 @@
 # <img src="assets/logo-square.png" alt="Clifton" width="32" height="32" align="middle"> Clifton MCP
 
 [![Build](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
@@ -10,16 +10,18 @@ Clifton exposes MCP tools for markets and finance research, Data Vault file disc
 ![Clifton answering a financial research question in Claude](assets/demo.gif)
 
 
-**Endpoint:** `https://ai.cliftonapi.com/v1/mcp`
+**Endpoint:** `https://ai.cliftonapi.com/v2/mcp`
 
 ## Quick Start
+
+MCP v2 acknowledges a saved request before its answer is ready. Your app then uses `clifton_get_response`; each running poll waits server-side for up to ten seconds. Existing connections must update to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
 
 ### Claude Desktop, Claude Web, ChatGPT Desktop, ChatGPT Web
 
 In Claude Desktop or Web, add a custom connector. In ChatGPT Desktop, add an HTTP MCP server and select **Authenticate**. In ChatGPT Web, create a custom MCP connection in Developer mode. Use this server URL:
 
 ```text
-https://ai.cliftonapi.com/v1/mcp
+https://ai.cliftonapi.com/v2/mcp
 ```
 
 Sign in with your Clifton account for OAuth connections. ChatGPT Web requires an eligible account and workspace permission.
@@ -51,7 +53,8 @@ Config snippets live in [`examples/`](examples/).
 
 ## Tools
 
-- **`clifton_ask`** — answers markets & finance questions (equities, ETFs, crypto, bonds, options, macro) from filings, earnings transcripts, analyst expectations, market data, and news; returns citations.
+- **`clifton_ask`** — starts a saved markets or finance request and returns its session/message IDs.
+- **`clifton_get_response`** — reads that request until it completes, with the answer and citations; running reads wait server-side for up to ten seconds.
 - **`clifton_list_vault_files`:** OAuth and API-key file discovery for Clifton Data Vault. Use returned file IDs in `clifton_ask.attachments`.
 - **Agent tools:** `clifton_create_agent` creates a standing monitor through a short conversation; `clifton_delete_agent` removes one owned by an authorized user; `clifton_list_agents`, `clifton_list_agent_reports`, and `clifton_get_agent_report` read agents and reports. Guide: [AGENT-TOOLS.md](AGENT-TOOLS.md).
 
