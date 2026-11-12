@@ -175,6 +175,16 @@ Discover the current native contract through the same selected tool:
    `{"request_json":"{\"scope\":\"<returned scope>\"}"}` to discover its request schemas.
 3. Build the native query from those schemas and send its JSON as `request_json`.
 
+Apply the selected tool's request protocol:
+
+- `clifton_search`: put the selected public scope and the entry's `version`
+  at the root. Build `request` with its selector from the entry's `type`
+  metadata and the remaining fields described by `entry.request`.
+- `clifton_retrieve`: `entry.request` describes the complete root JSON body.
+
+The endpoint determines the verb. Selector values and field definitions come
+from API discovery; fill those fields with the values requested by the user.
+
 There is no MCP copy of the scope, schema, operation or filter catalog.
 Pagination uses only the native controls shown by the returned schema. MCP
 does not create cursors, fetch another page automatically or assume every

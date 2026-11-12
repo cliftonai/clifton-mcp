@@ -20,8 +20,8 @@ Discover the current request contract through the chosen tool. Send
 `{"request_json":"{}"}` to discover its public scopes, choose a scope returned
 by that endpoint, then send
 `{"request_json":"{\"scope\":\"<returned scope>\"}"}` to discover its schemas.
-Construct the native query from those returned schemas and pass its JSON as
-`request_json`. Do not invent or maintain a scope list, schema, filter name,
+Apply the chosen tool's `request_json` instructions to the returned schema,
+then pass the native query JSON as `request_json`. Do not invent or maintain a scope list, schema, filter name,
 version or operation. Keep numeric literals in the JSON string unchanged.
 Organization eligibility and the public API's access rules still apply.
 

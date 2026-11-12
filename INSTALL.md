@@ -121,7 +121,8 @@ rollout and account access.
 
 For either direct tool, first call with `{"request_json":"{}"}`. Use a scope
 returned by the endpoint in a scope-only request to discover its schemas,
-then build the native query from them. Confirm the complete body, native
+then apply the selected tool's `request_json` instructions to build its query.
+Confirm the complete body, native
 status and discovery flag. `422` with `discovery:true` is schema education;
 query data requires 2xx and no discovery flag. Tool names or final prose alone
 do not prove a successful read.

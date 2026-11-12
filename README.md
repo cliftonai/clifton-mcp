@@ -66,6 +66,7 @@ For the two direct-data tools, discover the contract at runtime: call with
 `{"request_json":"{}"}` for public scopes, then with a returned scope in the
 JSON string for request schemas, and build the query from that response.
 Scopes and schemas come from the endpoint; MCP does not copy their catalog.
+The selected tool's `request_json` instructions explain its request envelope.
 These tools require an eligible organization account. General analysis and
 sourced research still use `clifton_ask`. Direct-data delivery is bounded at
 45 seconds and 1 MiB for the complete encoded response. Use native pagination

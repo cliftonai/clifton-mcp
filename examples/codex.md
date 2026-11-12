@@ -45,6 +45,9 @@ Discover each tool's current contract rather than keeping a local scope list:
 3. Build the native query from the returned schema and pass its JSON unchanged
    as `request_json`.
 
+Follow the selected tool's `request_json` guidance for its request envelope.
+[Protocol details](../API.md#direct-public-data) explain the two tools.
+
 Eligible organization access is required. Discovery retains HTTP 422 with
 `discovery:true`; actual data requires 2xx, no discovery flag and complete
 JSON. Large successful output may be in a host file; read it to verify the
