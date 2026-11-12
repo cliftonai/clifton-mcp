@@ -111,6 +111,25 @@ Check that the app actually calls **`clifton_ask`** and returns a sourced answer
 
 Available tools depend on your account and authentication method. See [API.md](API.md) for research, agent, and Data Vault tools.
 
+## Check direct public data
+
+With an eligible organization account, explicitly ask for raw records to use
+`clifton_search`, or for ranked documents to use `clifton_retrieve`. Keep
+ordinary research questions on `clifton_ask`. Refresh the connection's tool
+list if a newly enabled tool is missing; availability depends on the server's
+rollout and account access.
+
+For either direct tool, first call with `{"request_json":"{}"}`. Use a scope
+returned by the endpoint in a scope-only request to discover its schemas,
+then build the native query from them. Confirm the complete body, native
+status and discovery flag. `422` with `discovery:true` is schema education;
+query data requires 2xx and no discovery flag. Tool names or final prose alone
+do not prove a successful read.
+
+Large successful output may appear in a complete host file. Read that file
+instead of accepting a clipped preview; if unavailable, request a smaller page
+using the returned schema's controls. [Direct data reference](API.md#direct-public-data).
+
 ## Manage access and get help
 
 - **Disconnect:** remove Clifton in your app's connector or MCP settings.

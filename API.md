@@ -155,6 +155,59 @@ Completed responses include plain text in `content[].text`, raw `structuredConte
 
 Errors set `isError` and include `error.code`, `class`, and `retryable` in the first JSON content block. Errors with a saved terminal state also include the typed `structuredContent`; errors without a valid saved handle omit it. Input-schema validation errors instead use a first JSON block with top-level `code: "invalid_arguments"` and `validation_errors`. Missing, deleted, or inaccessible turns produce `response_not_found`; do not interpret that as permission to resubmit. `execution_outcome_unknown` means the invocation ended without a saved terminal result. A storage-limit failure is explicit and never presented as a complete answer or valid JSON result. Database read failures remain retryable polling errors.
 
+### Direct public data
+
+Use `clifton_search` for explicit raw structured data through public
+`POST /v3/search`, and `clifton_retrieve` for ranked document retrieval through
+public `POST /v3/retrieve`. Analysis and ordinary sourced answers continue to
+use `clifton_ask`. Both direct tools require eligible organization access;
+availability also depends on environment rollout.
+
+Both accept one required field, `request_json`, a string containing the exact
+native public request JSON (at most 256 KiB UTF-8). Keep numeric literals in
+that string unchanged. Authentication supplies identity and payer; these are
+not request fields.
+
+Discover the current native contract through the same selected tool:
+
+1. Send `{"request_json":"{}"}` to discover public scopes.
+2. Choose a returned scope and send
+   `{"request_json":"{\"scope\":\"<returned scope>\"}"}` to discover its request schemas.
+3. Build the native query from those schemas and send its JSON as `request_json`.
+
+There is no MCP copy of the scope, schema, operation or filter catalog.
+Pagination uses only the native controls shown by the returned schema. MCP
+does not create cursors, fetch another page automatically or assume every
+operation supports pagination.
+
+A public response exposes `http_status`, `content_type`, and `response_json`
+in `structuredContent`, with optional `retry_after` and `discovery:true`.
+`response_json` is the complete native JSON string. The first text block is
+that same exact JSON; the second is JSON status metadata for hosts that expose
+only content. It does not duplicate `response_json`.
+
+A pure original empty or scope-only probe that returns public
+`422 invalid_input` with nonempty scope/schema education is successful MCP
+discovery: `isError:false`, `http_status:422`, `discovery:true`. That result is
+schema education, not query data. Ordinary query data requires 2xx, no discovery
+flag and a complete valid body. Actual query validation, access/rate refusals
+and service failures remain errors, even if they contain help text.
+
+The complete encoded JSON-RPC response or SSE message must fit within 1 MiB,
+including framing, metadata and both body copies. Actual errors have an 8 KiB
+aggregate text limit. Overflow replaces the whole result with an explicit
+error; JSON is never silently truncated. A host may put a large successful
+result in a file: retrieve the complete file or narrow the request using the
+native schema's controls. The server limit is not a promise that every host
+shows the result inline.
+
+Delivery ends within 45 seconds of native entry, including authentication and
+setup. An already dispatched operation remains retained through its original
+completion/accounting. An unknown outcome must not be automatically retried.
+These calls have no saved job/session/message handle and are not polled with
+`clifton_get_response`. Public search has no metered debit; retrieve uses the
+existing admission and debits its actual provider cost once.
+
 ### `clifton_list_vault_files` *(read-only)*
 
 Find Clifton Data Vault files for an authorized owner, then pass returned file IDs to `clifton_ask.attachments`.

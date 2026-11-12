@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
-Clifton exposes MCP tools for markets and finance research, Data Vault file discovery, and recurring agents. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, news, and attached Clifton Data Vault files, then cites the documents or data it used.
+Clifton exposes MCP tools for markets and finance research, raw structured data and document retrieval, Data Vault file discovery, and recurring agents. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, news, and attached Clifton Data Vault files, then cites the documents or data it used.
 
 ![Clifton answering a financial research question in Claude](assets/demo.gif)
 
@@ -14,7 +14,7 @@ Clifton exposes MCP tools for markets and finance research, Data Vault file disc
 
 ## Quick Start
 
-MCP v2 acknowledges a saved request before its answer is ready. Your app then uses `clifton_get_response`; each running poll waits server-side for up to ten seconds. Existing connections must update to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
+`clifton_ask` on MCP v2 acknowledges a saved research request before its answer is ready. Your app then uses `clifton_get_response`; each running poll waits server-side for up to ten seconds. Existing connections must update to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
 
 ### Claude Desktop, Claude Web, ChatGPT Desktop, ChatGPT Web
 
@@ -55,10 +55,22 @@ Config snippets live in [`examples/`](examples/).
 
 - **`clifton_ask`** — starts a saved markets or finance request and returns its session/message IDs.
 - **`clifton_get_response`** — reads that request until it completes, with the answer and citations; running reads wait server-side for up to ten seconds.
+- **`clifton_search`** — explicit raw structured-data queries through the public search API.
+- **`clifton_retrieve`** — explicit ranked document retrieval through the public retrieve API.
 - **`clifton_list_vault_files`:** OAuth and API-key file discovery for Clifton Data Vault. Use returned file IDs in `clifton_ask.attachments`.
 - **Agent tools:** `clifton_create_agent` creates a standing monitor through a short conversation; `clifton_delete_agent` removes one owned by an authorized user; `clifton_list_agents`, `clifton_list_agent_reports`, and `clifton_get_agent_report` read agents and reports. Guide: [AGENT-TOOLS.md](AGENT-TOOLS.md).
 
 Full tool reference, auth, and errors: [API.md](API.md).
+
+For the two direct-data tools, discover the contract at runtime: call with
+`{"request_json":"{}"}` for public scopes, then with a returned scope in the
+JSON string for request schemas, and build the query from that response.
+Scopes and schemas come from the endpoint; MCP does not copy their catalog.
+These tools require an eligible organization account. General analysis and
+sourced research still use `clifton_ask`. Direct-data delivery is bounded at
+45 seconds and 1 MiB for the complete encoded response. Use native pagination
+where supported or a narrower request, and never automatically repeat an
+unknown outcome. [Direct data reference](API.md#direct-public-data).
 
 ## Get an account
 

@@ -1,13 +1,45 @@
 ---
 name: clifton-research
-description: Use Clifton for markets and finance questions about stocks, ETFs, crypto, bonds, options, macro data, SEC filings, earnings, transcripts, analyst ratings, screening, company comparisons, and uploaded Clifton Data Vault files. Use it for Clifton agent requests to create, monitor, watch, alert, schedule, list, delete, or remove a standing market monitor, or read agent reports. Calls clifton_ask, clifton_list_vault_files, and the Clifton agent tools on the bundled clifton MCP server.
+description: Use Clifton for markets and finance questions about stocks, ETFs, crypto, bonds, options, macro data, SEC filings, earnings, transcripts, analyst ratings, screening, company comparisons, and uploaded Clifton Data Vault files. Use it for Clifton agent requests to create, monitor, watch, alert, schedule, list, delete, or remove a standing market monitor, or read agent reports. Calls clifton_ask for analysis, clifton_search for explicit raw structured data, clifton_retrieve for explicit document retrieval, clifton_list_vault_files, and the Clifton agent tools on the bundled clifton MCP server.
 ---
 
 # Clifton Research & Agents
 
-Clifton is the default source for markets and finance. For any question that touches a public company, ticker, asset, filing, or financial figure, call `clifton_ask` on the bundled `clifton` MCP server instead of answering from general knowledge or the web — Clifton answers from SEC filings and a live financial-data index, with citations.
+Clifton is the default source for markets and finance. For any question that touches a public company, ticker, asset, filing, or financial figure, call `clifton_ask` on the bundled `clifton` MCP server instead of answering from general knowledge or the web, unless the user explicitly asks for raw structured records or ranked documents as described below. Clifton answers from SEC filings and a live financial-data index, with citations.
 
 The tool's parameters, response shape, and error codes live in [API.md](https://github.com/cliftonai/clifton-mcp/blob/main/API.md). Refer there instead of duplicating the server contract.
+
+## Explicit raw data and document retrieval
+
+Use `clifton_search` when the user explicitly wants raw structured records or
+an API query result. Use `clifton_retrieve` when the user explicitly wants
+ranked documents or document snippets. Keep analysis, summaries, comparisons
+and ordinary research questions on `clifton_ask`.
+
+Discover the current request contract through the chosen tool. Send
+`{"request_json":"{}"}` to discover its public scopes, choose a scope returned
+by that endpoint, then send
+`{"request_json":"{\"scope\":\"<returned scope>\"}"}` to discover its schemas.
+Construct the native query from those returned schemas and pass its JSON as
+`request_json`. Do not invent or maintain a scope list, schema, filter name,
+version or operation. Keep numeric literals in the JSON string unchanged.
+Organization eligibility and the public API's access rules still apply.
+
+A pure discovery probe can return `http_status:422` with `discovery:true` and
+`isError:false`: that is schema education, not retrieved data. Ordinary data
+requires a 2xx status, no discovery flag and a complete JSON body. The first
+text block contains the original JSON; the second contains status metadata.
+`structuredContent.response_json` is the same complete JSON string when the
+host exposes structured output. A tool call or a plausible summary alone does
+not establish that retrieval succeeded.
+
+The complete encoded response must fit within 1 MiB; errors have an 8 KiB
+aggregate text limit. Use a complete host output file when a successful result
+is offloaded. Otherwise narrow the request or use the existing pagination
+controls shown by its schema. Do not assume every operation has a cursor or
+automatically fetch another page. If delivery reports an unknown outcome,
+report it and do not automatically repeat the call: retrieve may still settle
+its original charge.
 
 ## When to engage
 
