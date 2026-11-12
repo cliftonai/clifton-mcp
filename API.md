@@ -201,7 +201,7 @@ Five tools for creating, deleting, and reading Clifton agents (standing monitors
 ## Execution and limits
 
 - `effort` selects the existing Instant or Research model. Research remains gated; discover the schema and eligibility through authenticated `tools/list`.
-- MCP does not impose its former short model execution cap. The selected model's normal time/cost limits, available credit, cumulative message budget, and Router invocation deadline still apply.
+- MCP does not impose its former short execution cap. MCP Instant uses the selected model maximum when it raises the ordinary default (currently 300 seconds); Research retains its configured default (currently 720 seconds). These configured values remain subject to cost, available credit, cumulative message budgets and the Router invocation deadline. Other callers' defaults remain unchanged.
 - Acknowledgement and final completion are separate. Losing the host connection after acknowledgement does not itself stop the Router's retained execution.
 - Questions and pauses require action; polling alone cannot finish them. A resume preserves the original message's cumulative budget.
 - The per-organization chat quota still applies to submissions. Response reads do not reserve or pay for a new answer.
