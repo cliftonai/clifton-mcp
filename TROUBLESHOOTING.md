@@ -39,6 +39,12 @@ Your host cached an older copy of Clifton's tool list. When Clifton releases a n
 
 A plain reconnect re-fetches the current tool list on the next session. If the stale option still appears after reconnecting, remove and re-add the server.
 
+### A data result appears clipped
+
+The 1 MiB response limit governs what Clifton sends. Your host may show its model a smaller preview, even when its client log contains the complete result. Increasing a client output setting does not guarantee complete model input.
+
+If the host reports a complete result-file path, read that file and verify the whole JSON. Otherwise, use the API-discovered page/limit controls to request a smaller result, or use the REST API for larger data. Do not treat a preview as the full data. [Direct data reference](API.md#direct-public-data).
+
 ### Something else
 
 Email `support@cliftonai.com` with `[MCP]` in the subject. Include the host, the question, and the `request_id` from the response if one was shown.

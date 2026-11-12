@@ -129,7 +129,9 @@ do not prove a successful read.
 
 Large successful output may appear in a complete host file. Read that file
 instead of accepting a clipped preview; if unavailable, request a smaller page
-using the returned schema's controls. [Direct data reference](API.md#direct-public-data).
+using the returned schema's controls. The 1 MiB server response limit does not
+override smaller host limits. A complete client log does not prove the model
+received the complete body. [Direct data reference](API.md#direct-public-data).
 
 ## Manage access and get help
 
