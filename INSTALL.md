@@ -5,8 +5,10 @@ Use Clifton for markets and finance research, recurring agents, and authorized D
 Every setup uses this MCP server URL:
 
 ```text
-https://ai.cliftonapi.com/v1/mcp
+https://ai.cliftonapi.com/v2/mcp
 ```
+
+**Upgrading an existing connection:** change its URL from `/v1/mcp` to `/v2/mcp`, then reconnect and refresh its tools. For the Claude Code plugin, update the `clifton-mcp` plugin and restart or reconnect it. Do not add a second Clifton connection. Existing agent and vault tools remain available on v2.
 
 Choose your app. **OAuth** means signing in with your Clifton account in a browser. For an **API key**, create one under **Settings → API keys** in the Clifton console.
 
@@ -22,7 +24,7 @@ Developer tools: [Claude Code](#claude-code), [Codex](#codex), and [Cursor](#cur
 ## Claude Desktop
 
 1. Open **Customize → Connectors → + → Add custom connector**. Some versions put **Connectors** under **Settings**.
-2. Enter **Name:** `Clifton` and **Remote MCP server URL:** `https://ai.cliftonapi.com/v1/mcp`. Leave optional OAuth client fields empty.
+2. Enter **Name:** `Clifton` and **Remote MCP server URL:** `https://ai.cliftonapi.com/v2/mcp`. Leave optional OAuth client fields empty.
 3. Add the connector, select **Connect** if prompted, and sign in to Clifton.
 4. In a new chat, open **+ → Connectors**, enable Clifton, and [try a question](#check-the-connection).
 
@@ -39,7 +41,7 @@ If you already connected Clifton in Claude Desktop with the same Claude account,
 ## ChatGPT Desktop
 
 1. Open **Settings → MCP servers → Add server** (called **Connect to a custom MCP** in some versions).
-2. Select **Streamable HTTP**. Enter **Name:** `clifton` and **URL:** `https://ai.cliftonapi.com/v1/mcp`. Leave API-key headers and optional OAuth client fields empty.
+2. Select **Streamable HTTP**. Enter **Name:** `clifton` and **URL:** `https://ai.cliftonapi.com/v2/mcp`. Leave API-key headers and optional OAuth client fields empty.
 3. Save, select **Authenticate**, and sign in with your Clifton account in the browser.
 4. Return to the app, select **Restart** if prompted, and [try a question](#check-the-connection).
 
@@ -53,7 +55,7 @@ Create a custom MCP connection on [chatgpt.com](https://chatgpt.com). Developer 
 
 1. Open **Settings → Security and login** and enable **Developer mode**. If unavailable, check your account eligibility or ask your workspace administrator.
 2. Open [Plugins](https://chatgpt.com/plugins) and select **+** to add a developer-mode app.
-3. Enter **Name:** `Clifton`, **Description:** `Markets and finance research`, and **MCP server URL:** `https://ai.cliftonapi.com/v1/mcp`.
+3. Enter **Name:** `Clifton`, **Description:** `Markets and finance research`, and **MCP server URL:** `https://ai.cliftonapi.com/v2/mcp`.
 4. Choose **OAuth**. Leave optional client ID and secret empty; if asked for a registration method, choose **Dynamic Client Registration (DCR)**. Create the connection and complete Clifton sign-in when prompted.
 5. In a new chat, choose **+ → Developer mode**, select Clifton, and [try a question](#check-the-connection).
 
@@ -85,7 +87,7 @@ For manual OAuth or API-key setup, see [Claude Code examples](examples/claude-co
 **CLI:** add the server and sign in:
 
 ```bash
-codex mcp add clifton --url https://ai.cliftonapi.com/v1/mcp
+codex mcp add clifton --url https://ai.cliftonapi.com/v2/mcp
 codex mcp login clifton
 ```
 
@@ -108,6 +110,28 @@ Start a new chat and ask:
 Check that the app actually calls **`clifton_ask`** and returns a sourced answer. A response that merely lists tool names does not prove the connection works.
 
 Available tools depend on your account and authentication method. See [API.md](API.md) for research, agent, and Data Vault tools.
+
+## Check direct public data
+
+With an eligible organization account, explicitly ask for raw records to use
+`clifton_search`, or for ranked documents to use `clifton_retrieve`. Keep
+ordinary research questions on `clifton_ask`. Refresh the connection's tool
+list if a newly enabled tool is missing; availability depends on the server's
+rollout and account access.
+
+For either direct tool, first call with `{"request_json":"{}"}`. Use a scope
+returned by the endpoint in a scope-only request to discover its schemas,
+then apply the selected tool's `request_json` instructions to build its query.
+Confirm the complete body, native
+status and discovery flag. `422` with `discovery:true` is schema education;
+query data requires 2xx and no discovery flag. Tool names or final prose alone
+do not prove a successful read.
+
+Large successful output may appear in a complete host file. Read that file
+instead of accepting a clipped preview; if unavailable, request a smaller page
+using the returned schema's controls. The 1 MiB server response limit does not
+override smaller host limits. A complete client log does not prove the model
+received the complete body. [Direct data reference](API.md#direct-public-data).
 
 ## Manage access and get help
 

@@ -1,25 +1,27 @@
 # <img src="assets/logo-square.png" alt="Clifton" width="32" height="32" align="middle"> Clifton MCP
 
 [![Build](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
-Clifton exposes MCP tools for markets and finance research, Data Vault file discovery, and recurring agents. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, news, and attached Clifton Data Vault files, then cites the documents or data it used.
+Clifton exposes MCP tools for markets and finance research, raw structured data and document retrieval, Data Vault file discovery, and recurring agents. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, news, and attached Clifton Data Vault files, then cites the documents or data it used.
 
 ![Clifton answering a financial research question in Claude](assets/demo.gif)
 
 
-**Endpoint:** `https://ai.cliftonapi.com/v1/mcp`
+**Endpoint:** `https://ai.cliftonapi.com/v2/mcp`
 
 ## Quick Start
+
+`clifton_ask` on MCP v2 acknowledges a saved research request before its answer is ready. Your app waits `poll_after_seconds` (currently ten seconds), then uses `clifton_get_response` to read the current saved state. Each read returns as soon as storage completes; while running, your app waits again before its next read. This requires the app's own timing facility; hosts without one remain unvalidated for this flow. Existing connections must update to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
 
 ### Claude Desktop, Claude Web, ChatGPT Desktop, ChatGPT Web
 
 In Claude Desktop or Web, add a custom connector. In ChatGPT Desktop, add an HTTP MCP server and select **Authenticate**. In ChatGPT Web, create a custom MCP connection in Developer mode. Use this server URL:
 
 ```text
-https://ai.cliftonapi.com/v1/mcp
+https://ai.cliftonapi.com/v2/mcp
 ```
 
 Sign in with your Clifton account for OAuth connections. ChatGPT Web requires an eligible account and workspace permission.
@@ -51,11 +53,25 @@ Config snippets live in [`examples/`](examples/).
 
 ## Tools
 
-- **`clifton_ask`** — answers markets & finance questions (equities, ETFs, crypto, bonds, options, macro) from filings, earnings transcripts, analyst expectations, market data, and news; returns citations.
+- **`clifton_ask`** — starts a saved markets or finance request and returns its session/message IDs.
+- **`clifton_get_response`** — reads the current saved state for those exact IDs, with the answer and citations when complete. Stop polling on completion or when action is required.
+- **`clifton_search`** — explicit raw structured-data queries through the public search API.
+- **`clifton_retrieve`** — explicit ranked document retrieval through the public retrieve API.
 - **`clifton_list_vault_files`:** OAuth and API-key file discovery for Clifton Data Vault. Use returned file IDs in `clifton_ask.attachments`.
 - **Agent tools:** `clifton_create_agent` creates a standing monitor through a short conversation; `clifton_delete_agent` removes one owned by an authorized user; `clifton_list_agents`, `clifton_list_agent_reports`, and `clifton_get_agent_report` read agents and reports. Guide: [AGENT-TOOLS.md](AGENT-TOOLS.md).
 
 Full tool reference, auth, and errors: [API.md](API.md).
+
+For the two direct-data tools, discover the contract at runtime: call with
+`{"request_json":"{}"}` for public scopes, then with a returned scope in the
+JSON string for request schemas, and build the query from that response.
+Scopes and schemas come from the endpoint; MCP does not copy their catalog.
+The selected tool's `request_json` instructions explain its request envelope.
+These tools require an eligible organization account. General analysis and
+sourced research still use `clifton_ask`. Direct-data delivery is bounded at
+45 seconds and 1 MiB for the complete encoded response. Use native pagination
+where supported or a narrower request, and never automatically repeat an
+unknown outcome. [Direct data reference](API.md#direct-public-data).
 
 ## Get an account
 

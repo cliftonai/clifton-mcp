@@ -2,7 +2,13 @@
 
 Public changes to the Clifton MCP tool surface.
 
-## [Unreleased]
+## [0.2.0] - Unreleased
+
+- **MCP v2 connection.** The plugin uses `https://ai.cliftonapi.com/v2/mcp`. Existing manual connections must update their URL and reconnect to refresh the tool list. The old endpoint returns upgrade instructions after retirement.
+- **Long-running answers.** `clifton_ask` returns saved session/message identifiers. `clifton_get_response` reads the current saved state and returns as soon as storage completes. Callers use their own timing facility to wait `poll_after_seconds` (currently ten seconds) after acknowledgement and between running reads. Polling never starts another answer or adds another answer charge.
+- **Research continuation.** When available for the caller, `effort: research` supports saved questions and pauses. Stop polling when input or a resume is required.
+- **Persistence required.** MCP v2 omits incognito. A lost initial acknowledgement must not trigger automatic resubmission. See [API.md](API.md).
+
 
 - **Data Vault file discovery.** OAuth and API-key callers can use `clifton_list_vault_files` to find authorized Clifton Data Vault file IDs, then pass those IDs to `clifton_ask.attachments`.
 - **Delete agents through MCP.** `clifton_delete_agent` lets OAuth and API-key callers delete an authorized owner's agent by id. Deletion stops future runs, cannot be undone, and retains existing reports.
