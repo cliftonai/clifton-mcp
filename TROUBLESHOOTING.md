@@ -24,7 +24,7 @@ Change its URL from `/v1/mcp` to `https://ai.cliftonapi.com/v2/mcp`, then reconn
 
 ### The request says it is running
 
-This is an acknowledgement, not the final answer. Your host should call `clifton_get_response` with the returned session and message IDs. The tool waits server-side for up to ten seconds; repeat while the status remains `running`. A question or pause needs action, so stop polling and follow the returned instructions.
+This is an acknowledgement, not the final answer. Wait `poll_after_seconds` (currently ten seconds), then call `clifton_get_response` with the exact returned session and message IDs. Each call reads the current saved state and returns as soon as storage completes. While the status remains `running`, wait the recommended delay before reading again. Your host needs its own timing facility; hosts without one remain unvalidated for this flow. Stop polling on completion, failure, expiry, or a stopped request. A question or pause needs action, so stop polling and follow the returned instructions.
 
 If the initial acknowledgement itself was lost, do not automatically submit the question again. Report the uncertain outcome and request reference instead; a fresh submission can create another task and charge.
 

@@ -5,7 +5,7 @@ Public changes to the Clifton MCP tool surface.
 ## [0.2.0] - Unreleased
 
 - **MCP v2 connection.** The plugin uses `https://ai.cliftonapi.com/v2/mcp`. Existing manual connections must update their URL and reconnect to refresh the tool list. The old endpoint returns upgrade instructions after retirement.
-- **Long-running answers.** `clifton_ask` returns saved session/message identifiers. Call `clifton_get_response` to retrieve the final answer; running polls wait server-side for up to ten seconds. Polling never starts another answer or adds another answer charge.
+- **Long-running answers.** `clifton_ask` returns saved session/message identifiers. `clifton_get_response` reads the current saved state and returns as soon as storage completes. Callers use their own timing facility to wait `poll_after_seconds` (currently ten seconds) after acknowledgement and between running reads. Polling never starts another answer or adds another answer charge.
 - **Research continuation.** When available for the caller, `effort: research` supports saved questions and pauses. Stop polling when input or a resume is required.
 - **Persistence required.** MCP v2 omits incognito. A lost initial acknowledgement must not trigger automatic resubmission. See [API.md](API.md).
 

@@ -141,12 +141,12 @@ Use only returned identifiers. If the connection fails before you receive them, 
 
 Pass the exact `session_id` and `message_id` from the acknowledgement. The same authenticated user and organization, or the same API-key identity, must fetch the result. Another user or key in the same organization cannot read it through this tool.
 
-Call the tool immediately after acknowledgement. A running poll waits server-side for up to ten seconds, so the host does not need a sleep tool or an additional delay. Polling never starts, resumes, or charges for another answer.
+Each call makes one bounded logical read of the exact saved turn and returns as soon as storage completes, without an intentional polling delay. `poll_after_seconds` (currently `10`) is the recommended client delay: wait about ten seconds after acknowledgement and between reads while the status is `running`. The client needs its own timing facility to honor that delay; hosts without one remain unvalidated for this flow. Polling never starts, resumes, or charges for another answer.
 
 | `status` | `complete` | What the host does |
 | --- | --- | --- |
-| `running` | false | Call `clifton_get_response` again with the same IDs. |
-| `completed` | true | Use the saved answer. |
+| `running` | false | Wait `poll_after_seconds` seconds, then call `clifton_get_response` again with the same IDs. |
+| `completed` | true | Stop polling; use the saved answer. |
 | `needs_input` | false | Stop polling; relay `question` and answer it using `clifton_ask` with the same IDs and effort. |
 | `paused` | false | Stop polling; explicitly resume with `clifton_ask` using the same IDs and effort. |
 | `failed`, `expired`, `stopped` | true | Stop polling and report the outcome. |
@@ -279,7 +279,7 @@ Five tools for creating, deleting, and reading Clifton agents (standing monitors
 |---|---|---|
 | `401 Unauthorized` immediately on any RPC | Missing or wrong `X-API-Key` / `Authorization` header. | Verify the key is current; for OAuth, complete the auth flow before issuing tool calls. |
 | `mcp_upgrade_required` from the old endpoint | The connection uses `/v1/mcp`. | Update it to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh tools. |
-| A submission returns `status: running` | The request is accepted and saved. | Poll `clifton_get_response` using its exact session and message IDs. |
+| A submission returns `status: running` | The request is accepted and saved. | Wait `poll_after_seconds` seconds, then call `clifton_get_response` using its exact session and message IDs. |
 | Tool not found on `tools/call` (`METHOD_NOT_FOUND`) | Tool not in the currently-enabled set. | Confirm via `tools/list`; only currently-enabled tools respond. |
 | OAuth completes but `tools/call` returns 401 | The access token's identity claim could not be resolved. | Re-run sign-in; if persistent, contact support with the trace details. |
 | `Automatic client registration isn't supported` in Claude Web | Client tried DCR against the wrong endpoint. | Update the connector URL to `https://ai.cliftonapi.com/v2/mcp`; the DCR shim handles registration. |

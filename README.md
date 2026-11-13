@@ -14,7 +14,7 @@ Clifton exposes MCP tools for markets and finance research, raw structured data 
 
 ## Quick Start
 
-`clifton_ask` on MCP v2 acknowledges a saved research request before its answer is ready. Your app then uses `clifton_get_response`; each running poll waits server-side for up to ten seconds. Existing connections must update to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
+`clifton_ask` on MCP v2 acknowledges a saved research request before its answer is ready. Your app waits `poll_after_seconds` (currently ten seconds), then uses `clifton_get_response` to read the current saved state. Each read returns as soon as storage completes; while running, your app waits again before its next read. This requires the app's own timing facility; hosts without one remain unvalidated for this flow. Existing connections must update to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
 
 ### Claude Desktop, Claude Web, ChatGPT Desktop, ChatGPT Web
 
@@ -54,7 +54,7 @@ Config snippets live in [`examples/`](examples/).
 ## Tools
 
 - **`clifton_ask`** — starts a saved markets or finance request and returns its session/message IDs.
-- **`clifton_get_response`** — reads that request until it completes, with the answer and citations; running reads wait server-side for up to ten seconds.
+- **`clifton_get_response`** — reads the current saved state for those exact IDs, with the answer and citations when complete. Stop polling on completion or when action is required.
 - **`clifton_search`** — explicit raw structured-data queries through the public search API.
 - **`clifton_retrieve`** — explicit ranked document retrieval through the public retrieve API.
 - **`clifton_list_vault_files`:** OAuth and API-key file discovery for Clifton Data Vault. Use returned file IDs in `clifton_ask.attachments`.
