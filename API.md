@@ -10,6 +10,8 @@ Technical reference for connecting an MCP host to Clifton. Use this for Claude C
 
 `https://ai.cliftonapi.com/v2/mcp`
 
+This reference describes unreleased v2. Keep the existing MCP available while v2 is tested separately; cutover requires all v2 tools to pass testing and separate approval. See the [release hold](CHANGELOG.md#020---unreleased).
+
 - **Transport:** Streamable HTTP (MCP `2025-06-18`; `2025-03-26` accepted for client back-compat).
 - **Protocol:** JSON-RPC 2.0 single-request per POST. Batch arrays are **not** supported.
 - **Region:** us-east-2.
@@ -104,6 +106,8 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 ## Available tools
 
 > **Tool contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json` lists public tools. Authenticated `tools/list` applies user and organization gates and is authoritative for the caller. The summary below is non-authoritative and may lag the live contract.
+
+V2 defines six tools: `clifton_ask`, `clifton_get_response`, `clifton_search`, `clifton_retrieve`, `clifton_list_vault_files`, and `clifton_get_vault_file`. A caller may see fewer because of access or rollout gates. Agent tools are unavailable in v2; use the [Clifton console](https://console.cliftonapi.com) for agents and reports.
 
 ### `clifton_ask` *(starts one answer)*
 
@@ -218,11 +222,17 @@ These calls have no saved job/session/message handle and are not polled with
 `clifton_get_response`. Public search has no metered debit; retrieve uses the
 existing admission and debits its actual provider cost once.
 
+### Data Vault access
+
+Both Vault tools accept OAuth and API keys and share the existing Vault feature gate (`mcp_list_vault_files`). Environment rollout can enable either tool independently. Existing admission requires a positive organization credit balance and applies rate limits, even though the tools have no per-call unit charge.
+
+OAuth callers default to the signed-in user. An explicit `owner_email` for another owner requires `vault:delegate`; ordinary organization-manager status or workflow delegation does not grant it. API-key callers must supply `owner_email`; without `vault:delegate` it must name an authorized organization manager. Vault delegation permits another selected owner within the authenticated organization. Neither tool accepts an organization override.
+
+Private downloads stay within the authenticated organization, including for administrators and Vault delegates. Authorized owner selection permits another owner's files inside that organization; it does not bypass the organization check. Existing direct-ID access to `GLOBAL` files in `READY` state remains available across organizations. The separate REST Vault API keeps its existing administrator behavior.
+
 ### `clifton_list_vault_files` *(read-only)*
 
-Find Clifton Data Vault files for an authorized owner, then pass returned file IDs to `clifton_ask.attachments`.
-
-OAuth callers default to the signed-in user. API-key callers must pass an `owner_email` for a manager in the authenticated organization.
+Find authorized Clifton Data Vault files. Pass a returned `file_id` to `clifton_get_vault_file` to download it, or to `clifton_ask.attachments` for analysis. Listing returns metadata and IDs, not download URLs or file contents.
 
 **Input**
 
@@ -233,31 +243,49 @@ OAuth callers default to the signed-in user. API-key callers must pass an `owner
 | `storage_class` | `EPHEMERAL` \| `DURABLE` | no | Optional storage class filter. |
 | `limit` | integer | no | Defaults to 50; maximum 1000. |
 | `offset` | integer | no | Zero-based pagination offset. |
-| `owner_email` | string | API key only | Vault owner. OAuth defaults to the signed-in user; API keys require an authorized manager email. |
+| `owner_email` | string | API-key calls | Authorized owner selector, subject to the Vault access rules above. OAuth defaults to the signed-in user. |
 
 **Output**
 
 | Field | Type | Notes |
 |---|---|---|
-| `files` | array | File metadata including `file_id`, filename, content type, size, scope, folder, and timestamps. |
+| `files` | array | File metadata including `file_id`, `original_filename`, content type, size, scope, folder, and timestamps. |
 | `folders` | array | Immediate child folders when browsing. Empty when `query` is provided. |
 | `attachment_ids` | string[] | File IDs from `files[].file_id`; pass these to `clifton_ask.attachments`. |
 | `current_path` | string | Folder path used for the result. |
+| `is_system_folder` | boolean | Whether the current path is a system folder. |
 | `pagination` | object | `limit`, `offset`, `total`, `count`, `has_more`. |
 
-### Agent tools
+### `clifton_get_vault_file` *(read-only)*
 
-Five tools for creating, deleting, and reading Clifton agents (standing monitors that generate reports when their condition fires). Full guide with examples, deletion behavior, the agent limit, `output_mode`, and `owner_email` semantics: [AGENT-TOOLS.md](AGENT-TOOLS.md).
+Request a download link for one authorized Vault file. Use a `file_id` returned by listing or a saved Clifton artifact; do not invent an ID or pass an S3 address.
 
-| Tool | Summary | Key input fields |
-|---|---|---|
-| `clifton_create_agent` | Multi-turn agent creation; commits on your confirmation. API-key access requires an organization gate and an authorized `owner_email` | `message` (required), `session_id`, `output_mode` (`chat` \| `models`), `owner_email`* |
-| `clifton_delete_agent` | Delete one agent owned by an authorized user. Existing reports remain available | `agent_id` (required), `owner_email`* |
-| `clifton_list_agents` | List agents, newest first | `owner_email`*, `limit` (default 10), `offset` |
-| `clifton_list_agent_reports` | List report summaries, newest first | `owner_email`*, `agent_id`, `limit` (default 10), `offset` |
-| `clifton_get_agent_report` | One report: markdown (chat), spreadsheet link (models), or a no-report `reason` | report id, `owner_email`* |
+**Input**
 
-\* `owner_email` defaults to the signed-in user for OAuth callers. API-key callers must provide an authorized manager email in the key's organization. `clifton_create_agent` also requires Clifton to enable API-key creation for that organization.
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `file_id` | UUID string | yes | Exact Vault file ID. |
+| `owner_email` | string | API-key calls | Authorized owner selector, subject to the Vault access rules above. OAuth defaults to the signed-in user. |
+
+No other input fields are accepted. Callers cannot choose a bucket, object key, URL lifetime, organization, or administrator override.
+
+**Output**
+
+All five fields appear in one JSON text block and the identical `structuredContent` object:
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `file_id` | string | The requested Vault file ID. |
+| `download_url` | string | Authorized HTTPS S3 URL for downloading the file. |
+| `filename` | string | Original filename. |
+| `content_type` | string | Stored content type, or `application/octet-stream`. |
+| `expires_in` | integer | Nominal URL lifetime: `900` seconds. |
+
+Download promptly with an HTTPS GET to `download_url`; S3 needs no Clifton bearer token or API-key header. The response contains a link, not file bytes. A host must observe a successful fetch or save before claiming the file was downloaded; hosts without that ability can present the link.
+
+Signed URLs are transferable bearer links, valid for up to 15 minutes and sometimes less. Access is checked when the URL is issued; an issued link may remain usable until expiry after access changes. Call the tool again for a fresh authorized URL. Keep `file_id` as the lasting reference rather than saving the signed URL as a permanent citation. Private Vault downloads do not use public short URLs.
+
+A missing, expired, non-ready, or inaccessible file produces the same `vault_file_unavailable` refusal with `isError:true` and no download URL. Owner, schema, gate, credit, and rate-limit failures remain their existing MCP refusals. Database or S3 failures remain service failures rather than being reported as a missing file. Check the MCP result, not HTTP success alone.
 
 ---
 

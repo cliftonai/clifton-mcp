@@ -1,14 +1,14 @@
 # Connect Clifton to your AI app
 
-Use Clifton for markets and finance research, recurring agents, and authorized Data Vault files. You need a [Clifton account](https://console.cliftonapi.com).
+Use Clifton for markets and finance research and authorized Data Vault file discovery and downloads. You need a [Clifton account](https://console.cliftonapi.com).
 
-Every setup uses this MCP server URL:
+These instructions describe unreleased MCP v2. Keep the existing MCP connection until all v2 tools are tested and the cutover is approved. After that cutover, every setup uses this MCP server URL:
 
 ```text
 https://ai.cliftonapi.com/v2/mcp
 ```
 
-**Upgrading an existing connection:** change its URL from `/v1/mcp` to `/v2/mcp`, then reconnect and refresh its tools. For the Claude Code plugin, update the `clifton-mcp` plugin and restart or reconnect it. Do not add a second Clifton connection. Existing agent and vault tools remain available on v2.
+**Upgrading after the approved cutover:** change the existing connection's URL from `/v1/mcp` to `/v2/mcp`, then reconnect and refresh its tools. For the Claude Code plugin, update the `clifton-mcp` plugin and restart or reconnect it. Do not add a second Clifton connection. V2 supports research, search/retrieve, and Vault listing/downloads; agent tools are unavailable in v2.
 
 Choose your app. **OAuth** means signing in with your Clifton account in a browser. For an **API key**, create one under **Settings → API keys** in the Clifton console.
 
@@ -59,7 +59,7 @@ Create a custom MCP connection on [chatgpt.com](https://chatgpt.com). Developer 
 4. Choose **OAuth**. Leave optional client ID and secret empty; if asked for a registration method, choose **Dynamic Client Registration (DCR)**. Create the connection and complete Clifton sign-in when prompted.
 5. In a new chat, choose **+ → Developer mode**, select Clifton, and [try a question](#check-the-connection).
 
-Clifton also offers tools that create or delete agents. Review the selected tools and any action confirmation before proceeding. See [Agent tools](AGENT-TOOLS.md).
+MCP v2 has no agent creation or deletion tools. Manage agents in the [Clifton console](https://console.cliftonapi.com).
 
 If sign-in fails, send [support](SUPPORT.md) the error. [OpenAI's Developer mode guide](https://developers.openai.com/api/docs/guides/developer-mode) · [Connection walkthrough](https://developers.openai.com/plugins/deploy/connect-chatgpt)
 
@@ -109,7 +109,9 @@ Start a new chat and ask:
 
 Check that the app actually calls **`clifton_ask`** and returns a sourced answer. A response that merely lists tool names does not prove the connection works.
 
-Available tools depend on your account and authentication method. See [API.md](API.md) for research, agent, and Data Vault tools.
+Available tools depend on your account and authentication method. See [API.md](API.md) for research, search/retrieve, and Data Vault tools.
+
+To download a Vault file, ask the app to find it with `clifton_list_vault_files`, then call `clifton_get_vault_file` with its returned `file_id`. The result includes a temporary signed S3 URL. Open that URL or let the app fetch it; a returned URL alone does not mean the app has saved the file. [Vault reference](API.md#clifton_get_vault_file-read-only).
 
 ## Check direct public data
 

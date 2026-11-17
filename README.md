@@ -5,16 +5,18 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
-Clifton exposes MCP tools for markets and finance research, raw structured data and document retrieval, Data Vault file discovery, and recurring agents. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, news, and attached Clifton Data Vault files, then cites the documents or data it used.
+Clifton exposes MCP tools for markets and finance research, raw structured data and document retrieval, and Data Vault file discovery and downloads. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, news, and attached Clifton Data Vault files, then cites the documents or data it used.
 
 ![Clifton answering a financial research question in Claude](assets/demo.gif)
 
 
 **Endpoint:** `https://ai.cliftonapi.com/v2/mcp`
 
+**Release status:** these docs describe unreleased MCP v2. The existing MCP stays available while v2 is tested separately. Keep your existing connection until all v2 tools are tested and the cutover is approved. [Release notes](CHANGELOG.md#020---unreleased).
+
 ## Quick Start
 
-`clifton_ask` on MCP v2 acknowledges a saved research request before its answer is ready. Your app waits `poll_after_seconds` (currently ten seconds), then uses `clifton_get_response` to read the current saved state. Each read returns as soon as storage completes; while running, your app waits again before its next read. This requires the app's own timing facility; hosts without one remain unvalidated for this flow. Existing connections must update to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
+`clifton_ask` on MCP v2 acknowledges a saved research request before its answer is ready. Your app waits `poll_after_seconds` (currently ten seconds), then uses `clifton_get_response` to read the current saved state. Each read returns as soon as storage completes; while running, your app waits again before its next read. This requires the app's own timing facility; hosts without one remain unvalidated for this flow. After the approved cutover, update existing connections to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
 
 ### Claude Desktop, Claude Web, ChatGPT Desktop, ChatGPT Web
 
@@ -39,7 +41,7 @@ On first use, Claude Code connects to Clifton over OAuth. No Client ID is requir
 
 > What was NVDA's most recent reported quarterly revenue?
 
-The plugin also adds a [`clifton-research` skill](plugins/clifton-mcp/skills/clifton-research/SKILL.md) that routes finance questions and agent-management requests to the matching Clifton tools.
+The plugin also adds a [`clifton-research` skill](plugins/clifton-mcp/skills/clifton-research/SKILL.md) that routes finance questions and Data Vault requests to the matching Clifton tools.
 
 ### Cursor, Codex, Manual Claude Code
 
@@ -57,8 +59,10 @@ Config snippets live in [`examples/`](examples/).
 - **`clifton_get_response`** — reads the current saved state for those exact IDs, with the answer and citations when complete. Stop polling on completion or when action is required.
 - **`clifton_search`** — explicit raw structured-data queries through the public search API.
 - **`clifton_retrieve`** — explicit ranked document retrieval through the public retrieve API.
-- **`clifton_list_vault_files`:** OAuth and API-key file discovery for Clifton Data Vault. Use returned file IDs in `clifton_ask.attachments`.
-- **Agent tools:** `clifton_create_agent` creates a standing monitor through a short conversation; `clifton_delete_agent` removes one owned by an authorized user; `clifton_list_agents`, `clifton_list_agent_reports`, and `clifton_get_agent_report` read agents and reports. Guide: [AGENT-TOOLS.md](AGENT-TOOLS.md).
+- **`clifton_list_vault_files`** — finds authorized Clifton Data Vault files. Use returned file IDs to download a file or pass them to `clifton_ask.attachments` for analysis.
+- **`clifton_get_vault_file`** — returns an authorized signed S3 download URL for one file ID, valid for up to 15 minutes.
+
+MCP v2 does not expose agent tools. Manage recurring agents and reports in the [Clifton console](https://console.cliftonapi.com). [Agent-tool availability](AGENT-TOOLS.md).
 
 Full tool reference, auth, and errors: [API.md](API.md).
 
