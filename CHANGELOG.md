@@ -8,7 +8,8 @@ The existing MCP stays running until all v2 tools are fully tested and the cutov
 
 - **MCP v2 connection.** The plugin targets `https://ai.cliftonapi.com/v2/mcp`. After the approved cutover, existing manual connections update their URL and reconnect to refresh the tool list. The old endpoint returns upgrade instructions after its separately approved retirement.
 - **Long-running answers.** `clifton_ask` returns saved session/message identifiers. `clifton_get_response` reads the current saved state and returns as soon as storage completes. Callers use their own timing facility to wait `poll_after_seconds` (currently ten seconds) after acknowledgement and between running reads. Polling never starts another answer or adds another answer charge.
-- **Research continuation.** When available for the caller, `effort: research` supports saved questions and pauses. Stop polling when input or a resume is required.
+- **Model and effort.** `model` chooses `instant` or `deep-thinking`; `effort` chooses `extra_low`, `low`, `medium`, `high`, `extra_high`, or `ultra`. Defaults are Instant/medium. V2 rejects the former profile values in `effort` and does not accept `model: research`. Deep Thinking retains its existing OAuth access requirement; API keys use Instant with any standard depth.
+- **Deep Thinking continuation.** Acknowledgements and recognized saved responses return both choices. Resume a saved question or pause with the exact model/effort pair, returned IDs, and original `response_format` if supplied. Omission applies defaults anew, not inheritance. Stop polling when action is required.
 - **Persistence required.** MCP v2 omits incognito. A lost initial acknowledgement must not trigger automatic resubmission. See [API.md](API.md).
 
 

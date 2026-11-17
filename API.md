@@ -116,13 +116,16 @@ Submit a markets or finance question. Clifton saves the turn before returning it
 | Input | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `message` | string | yes | Question or task. |
-| `effort` | `instant` or `research` | no | Defaults to Instant. Research requires OAuth and server activation for the caller. |
+| `model` | `instant` or `deep-thinking` | no | Defaults to `instant`. Deep Thinking requires OAuth and server activation for the caller. API-key callers are Instant-only. |
+| `effort` | `extra_low`, `low`, `medium`, `high`, `extra_high`, or `ultra` | no | Defaults to `medium`. All six depths are available within each permitted model, including Instant for API-key callers. |
 | `session_id` | string | no | Exact returned session ID for a follow-up; omit on the first call. |
 | `message_id` | string | resume only | Exact returned message ID when answering `needs_input` or resuming `paused`. Omit for an ordinary new follow-up. |
 | `response_format` | object | no | Feature-gated JSON Schema envelope. Resend on a continuation that requires structured output. |
 | `data_sources` | string[] | no | Selected sources. |
 | `attachments` | string[] | no | Authorized Clifton Data Vault file IDs found with `clifton_list_vault_files`. |
 | `context` | object | no | Host context; never identity or authority. |
+
+Model and effort are independent: Instant with `ultra` remains Instant; Deep Thinking with `extra_low` remains Deep Thinking. Both fields are optional strings, not nullable. Omitting either applies its default anew, rather than inheriting a previous turn's choice. Use the exact wire spellings above: `model: "research"`, the old `effort: "instant"` or `effort: "research"`, and spaced or provider-specific effort names are not accepted by v2. Refresh discovery when upgrading from an older contract; the old live MCP retains its contract until approved cutover.
 
 MCP v2 does not accept `incognito`. Unknown or foreign session identifiers are not permission to read another conversation.
 
@@ -132,6 +135,8 @@ A successful acknowledgement has `structuredContent`:
 {
   "session_id": "server-issued-session-id",
   "message_id": "server-issued-message-id",
+  "model": "instant",
+  "effort": "medium",
   "status": "running",
   "complete": false,
   "poll_after_seconds": 10,
@@ -141,9 +146,15 @@ A successful acknowledgement has `structuredContent`:
 
 Use only returned identifiers. If the connection fails before you receive them, report an uncertain outcome with the request reference when available. **Do not invent IDs or automatically resubmit the question:** a new ask can create a second task and charge.
 
+The acknowledgement saves and returns the resolved `model` and `effort`, including their defaults. To resume a Deep Thinking turn in `needs_input` or `paused`, resend that exact saved pair, its returned `session_id` and `message_id`, and the original `response_format` if one was supplied. Omitting the fields requests Instant/medium; it does not recover the paused turn's settings. A different pair is refused before a new execution. A completed follow-up uses `session_id` without `message_id`, starts a new turn, and may choose a different pair.
+
+An ask refusal sets `isError:true`. Read machine-readable details from the first JSON text content block rather than assuming a successful `structuredContent` receipt exists. Argument errors include `code: "invalid_arguments"` and `validation_errors`; other bounded refusals carry their code and any details in that JSON block.
+
 ### `clifton_get_response` *(read-only)*
 
 Pass the exact `session_id` and `message_id` from the acknowledgement. The same authenticated user and organization, or the same API-key identity, must fetch the result. Another user or key in the same organization cannot read it through this tool.
+
+This tool accepts IDs only; it does not take model or effort arguments. A recognized owned turn echoes its saved `model` and `effort` in running, action-needed, and terminal responses. Previously saved MCP turns whose choices cannot be identified omit both fields and cannot authorize a resume; do not guess the missing choices. Ordinary non-MCP turns and missing or foreign IDs remain unavailable through this reader.
 
 Each call makes one bounded logical read of the exact saved turn and returns as soon as storage completes, without an intentional polling delay. `poll_after_seconds` (currently `10`) is the recommended client delay: wait about ten seconds after acknowledgement and between reads while the status is `running`. The client needs its own timing facility to honor that delay; hosts without one remain unvalidated for this flow. Polling never starts, resumes, or charges for another answer.
 
@@ -151,13 +162,13 @@ Each call makes one bounded logical read of the exact saved turn and returns as 
 | --- | --- | --- |
 | `running` | false | Wait `poll_after_seconds` seconds, then call `clifton_get_response` again with the same IDs. |
 | `completed` | true | Stop polling; use the saved answer. |
-| `needs_input` | false | Stop polling; relay `question` and answer it using `clifton_ask` with the same IDs and effort. |
-| `paused` | false | Stop polling; explicitly resume with `clifton_ask` using the same IDs and effort. |
+| `needs_input` | false | Stop polling; relay `question` and answer it using `clifton_ask` with the same IDs, saved model/effort pair, and original `response_format` if supplied. |
+| `paused` | false | Stop polling; explicitly resume with `clifton_ask` using the same IDs, saved model/effort pair, and original `response_format` if supplied. |
 | `failed`, `expired`, `stopped` | true | Stop polling and report the outcome. |
 
 Completed responses include plain text in `content[].text`, raw `structuredContent.answer`, parsed `citations`, and optional `result` for structured output and `attachments` for produced files. Public source disclosures remain separate text blocks. While running, there is no final answer yet; token-by-token partial text is not returned.
 
-Errors set `isError` and include `error.code`, `class`, and `retryable` in the first JSON content block. Errors with a saved terminal state also include the typed `structuredContent`; errors without a valid saved handle omit it. Input-schema validation errors instead use a first JSON block with top-level `code: "invalid_arguments"` and `validation_errors`. Missing, deleted, or inaccessible turns produce `response_not_found`; do not interpret that as permission to resubmit. `execution_outcome_unknown` means the invocation ended without a saved terminal result. A storage-limit failure is explicit and never presented as a complete answer or valid JSON result. Database read failures remain retryable polling errors.
+Errors set `isError`; inspect the first JSON text content block for machine-readable details. Saved-state failures include `error.code`, `class`, and `retryable`, and a saved terminal state also includes typed `structuredContent`. Refusals without a valid saved handle omit it. Input-schema validation errors use a first JSON block with top-level `code: "invalid_arguments"` and `validation_errors`. Missing, deleted, or inaccessible turns produce `response_not_found`; do not interpret that as permission to resubmit. `execution_outcome_unknown` means the invocation ended without a saved terminal result. A storage-limit failure is explicit and never presented as a complete answer or valid JSON result. Database read failures remain retryable polling errors.
 
 ### Direct public data
 
@@ -291,10 +302,10 @@ A missing, expired, non-ready, or inaccessible file produces the same `vault_fil
 
 ## Execution and limits
 
-- `effort` selects the existing Instant or Research model. Research remains gated; discover the schema and eligibility through authenticated `tools/list`.
-- MCP does not impose its former short execution cap. MCP Instant uses the selected model maximum when it raises the ordinary default (currently 300 seconds); Research retains its configured default (currently 720 seconds). These configured values remain subject to cost, available credit, cumulative message budgets and the Router invocation deadline. Other callers' defaults remain unchanged.
+- `model` selects Instant or Deep Thinking; `effort` selects a standard depth within that model. Defaults are Instant/medium. Deep Thinking remains OAuth-only and gated; discover the schema and eligibility through authenticated `tools/list`.
+- MCP does not impose its former short execution cap. MCP Instant uses the selected model maximum when it raises the ordinary default (currently 300 seconds); Deep Thinking retains its configured default (currently 720 seconds). These configured values remain subject to cost, available credit, cumulative message budgets and the Router invocation deadline. Changing effort does not grant a larger time or cost allowance. Other callers' defaults remain unchanged.
 - Acknowledgement and final completion are separate. Losing the host connection after acknowledgement does not itself stop the Router's retained execution.
-- Questions and pauses require action; polling alone cannot finish them. A resume preserves the original message's cumulative budget.
+- Questions and pauses require action; polling alone cannot finish them. A same-message resume must match the saved model/effort pair and preserves the original message's cumulative budget. Omitted values apply the defaults, not the saved choices.
 - The per-organization chat quota still applies to submissions. Response reads do not reserve or pay for a new answer.
 - Keep the response-reading tool available while disabling new submissions so accepted work can drain.
 - JSON-RPC batch arrays are not supported.

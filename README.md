@@ -18,6 +18,8 @@ Clifton exposes MCP tools for markets and finance research, raw structured data 
 
 `clifton_ask` on MCP v2 acknowledges a saved research request before its answer is ready. Your app waits `poll_after_seconds` (currently ten seconds), then uses `clifton_get_response` to read the current saved state. Each read returns as soon as storage completes; while running, your app waits again before its next read. This requires the app's own timing facility; hosts without one remain unvalidated for this flow. After the approved cutover, update existing connections to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
 
+`model` selects `instant` (the default) or `deep-thinking` when enabled for an OAuth caller. `effort` independently selects `extra_low`, `low`, `medium` (the default), `high`, `extra_high`, or `ultra`. API-key callers use Instant with any of the six effort levels. Saved responses report both choices; resuming the same message requires that saved pair and the returned IDs. [Model, effort, and continuation details](API.md#clifton_ask-starts-one-answer).
+
 ### Claude Desktop, Claude Web, ChatGPT Desktop, ChatGPT Web
 
 In Claude Desktop or Web, add a custom connector. In ChatGPT Desktop, add an HTTP MCP server and select **Authenticate**. In ChatGPT Web, create a custom MCP connection in Developer mode. Use this server URL:
