@@ -2,27 +2,28 @@
 
 Public changes to the Clifton MCP tool surface.
 
-## [0.1.3] - 2026-11-18
+## [0.2.0] - 2026-11-19
 
-- Keep the packaged plugin on the live v1 endpoint with its matching ask and Vault-listing instructions while publishing the v2 preview reference. This reverses the agent-tool instructions added in 0.1.2; agent management remains available in the Clifton console.
-- Browser/Desktop v2 host acceptance remains pending; preview instructions do not establish support.
+MCP v2 is live at `https://ai.cliftonapi.com/v2/mcp`, and the packaged plugin now targets it. The v1 endpoint is retired: it returns only an upgrade notice (`mcp_upgrade_required` with an `upgrade_url`) and runs no tools or models.
 
-## [0.2.0] - Unreleased
-
-The existing MCP stays running until all v2 tools are fully tested and the cutover is separately approved. V2 includes v1 retirement and agent-tool removal. The packaged plugin remains on v1 until the live cutover; the preview reference does not move the live endpoint.
-
-- **MCP v2 connection.** A future v2 plugin will target `https://ai.cliftonapi.com/v2/mcp`. After the approved cutover, existing manual connections update their URL and reconnect to refresh the tool list. The old endpoint returns upgrade instructions after its separately approved retirement.
+- **Upgrading.** Manual connections change their URL from `/v1/mcp` to `/v2/mcp`, then reconnect to refresh the tool list. Plugin users update `clifton-mcp` to 0.2.0 and restart or reconnect. Do not add a second Clifton connection.
 - **Long-running answers.** `clifton_ask` returns saved session/message identifiers. `clifton_get_response` reads the current saved state and returns as soon as storage completes. Callers use their own timing facility to wait `poll_after_seconds` (currently ten seconds) after acknowledgement and between running reads. Polling never starts another answer or adds another answer charge.
-- **Model and effort.** `model` chooses `instant` or `deep-thinking`; `effort` chooses `extra_low`, `low`, `medium`, `high`, `extra_high`, or `ultra`. Defaults are Instant/medium. V2 rejects the former profile values in `effort` and does not accept `model: research`. Deep Thinking retains its existing OAuth access requirement; API keys use Instant with any standard depth.
-- **Deep Thinking continuation.** Acknowledgements and recognized saved responses return both choices. Resume a saved question or pause with the exact model/effort pair, returned IDs, and original `response_format` if supplied. Omission applies defaults anew, not inheritance. Stop polling when action is required.
+- **Model and effort.** `model` chooses `instant` or `deep-thinking`; `effort` chooses `extra_low`, `low`, `medium`, `high`, or `extra_high`; MCP does not offer `ultra`. Defaults are Instant/medium. Production currently serves Instant only; Deep Thinking retains its OAuth access requirement and appears in `tools/list` when enabled. V2 rejects the former profile values in `effort` and does not accept `model: research`.
+- **Continuation.** Acknowledgements and recognized saved responses return both choices. Resume a saved question or pause with the exact model/effort pair, returned IDs, and original `response_format` if supplied. Omission applies defaults anew, not inheritance. Stop polling when action is required.
 - **Persistence required.** MCP v2 omits incognito. A lost initial acknowledgement must not trigger automatic resubmission. See [API.md](API.md).
 - **Data Vault downloads.** Use `clifton_list_vault_files` to find an authorized file ID, then `clifton_get_vault_file` for a signed S3 download URL valid for up to 15 minutes. Use `clifton_ask.attachments` when the request is to analyze the file instead.
 - **Vault owner permissions.** OAuth defaults to the signed-in user; selecting another owner requires `vault:delegate`, not ordinary manager status or workflow delegation. API-key calls require an authorized owner selector. Private downloads remain inside the authenticated organization even for administrators; existing GLOBAL-file access remains.
-- **Six-tool scope.** V2 exposes ask, get response, search, retrieve, list Vault files, and get Vault file. Agent creation, deletion, listing, and report tools are unavailable in v2. Existing agents and reports remain available in the Clifton console.
+- **Six-tool scope.** V2 exposes ask, get response, search, retrieve, list Vault files, and get Vault file. Agent creation, deletion, listing, and report tools are not available. Existing agents and reports remain available in the Clifton console.
+- **Plugin skill.** `clifton-research` now covers the ask-and-poll flow, direct data through `clifton_search` and `clifton_retrieve`, and Vault downloads.
+- **Host testing.** Claude Code over OAuth was tested end to end. Claude Desktop, Claude Web, and ChatGPT Web setups are supported but have not been separately acceptance-tested on v2.
 
-## V1 history retained before the v2 preview
+## [0.1.3] - 2026-11-18
 
-- Data Vault listing and authorized API-key agent creation were documented before this preview. Delete-agent was also documented before the v2 retirement plan. See the [v1 reference](https://github.com/cliftonai/clifton-mcp/blob/346c08995539fea38a5192835dcb69d9ee4e172c/AGENT-TOOLS.md) for the historical contract.
+- Kept the packaged plugin on the v1 endpoint with its matching ask and Vault-listing instructions while the v2 reference was published ahead of cutover. This reversed the agent-tool instructions added in 0.1.2; agent management remains available in the Clifton console.
+
+## V1 history
+
+- Data Vault listing and authorized API-key agent creation were documented in v1. Delete-agent was also documented before the v2 retirement plan. See the [v1 reference](https://github.com/cliftonai/clifton-mcp/blob/346c08995539fea38a5192835dcb69d9ee4e172c/AGENT-TOOLS.md) for the historical contract.
 
 ## [0.1.2] - 2026-06-12
 

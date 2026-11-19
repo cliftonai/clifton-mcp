@@ -8,7 +8,7 @@ We aim to acknowledge reports within **3 business days** and provide a fix or st
 
 ## Scope
 
-This repo holds public docs and a Claude Code plugin (config + a skill). The live plugin uses `https://ai.cliftonapi.com/v1/mcp`. The `/v2/mcp` endpoint described in the preview reference is not yet live.
+This repo holds public docs and a Claude Code plugin (config + a skill). The plugin and the documented setup use `https://ai.cliftonapi.com/v2/mcp`.
 
 ## Privacy & terms
 

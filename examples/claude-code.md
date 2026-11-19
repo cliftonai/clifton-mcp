@@ -1,6 +1,6 @@
 # Claude Code — config snippets
 
-**V2 PREVIEW ONLY:** do not apply this v2 configuration before live cutover. For current access use [the live v1 connection](../LIVE.md). Host acceptance remains pending unless explicitly recorded.
+Upgrading from v1? Change an existing `/v1/mcp` URL to `/v2/mcp` and reconnect instead of adding a second connection.
 
 Plugin (recommended — OAuth, no key):
 
@@ -16,7 +16,7 @@ claude mcp add --transport http \
   clifton https://ai.cliftonapi.com/v2/mcp
 ```
 
-Run `/mcp` in Claude Code and select Clifton to sign in. Choose either the plugin or the manual server configuration.
+Run `/mcp` in Claude Code and select Clifton to sign in. Choose either the plugin or the manual server configuration. Plugin users upgrading from v1 update `clifton-mcp` to 0.2.0 and restart or reconnect.
 
 Manual API key — `~/.claude.json`:
 
