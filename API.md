@@ -16,7 +16,7 @@ This reference describes unreleased v2. Keep the existing MCP available while v2
 - **Protocol:** JSON-RPC 2.0 single-request per POST. Batch arrays are **not** supported.
 - **Region:** us-east-2.
 
-The public `tools/list` snapshot is published at `https://ai.cliftonapi.com/.well-known/mcp-tools.json`. OAuth-only tools are returned by authenticated `tools/list` after sign-in.
+The public snapshot at `https://ai.cliftonapi.com/.well-known/mcp-tools.json` describes the currently live build, not this unreleased v2 preview. Authenticated `tools/list` on the endpoint being tested is authoritative for that caller.
 
 ---
 
@@ -59,7 +59,7 @@ PKCE-only (no client secrets). Refresh tokens are accepted at the token endpoint
 /plugin install clifton-mcp@clifton-mcp
 ```
 
-No API key is required. The plugin ships the Clifton MCP server config, and Claude Code registers through OAuth/DCR on first use.
+The packaged plugin still connects to live v1, not this v2 preview. Its instructions link to the matching v1 API contract. No API key is required; Claude Code registers through OAuth/DCR on first use.
 
 **Or, manual with an API key:**
 
@@ -105,7 +105,7 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 
 ## Available tools
 
-> **Tool contract:** `https://ai.cliftonapi.com/.well-known/mcp-tools.json` lists public tools. Authenticated `tools/list` applies user and organization gates and is authoritative for the caller. The summary below is non-authoritative and may lag the live contract.
+> **Preview contract:** the six-tool summary below describes v2. The public snapshot describes the live build until cutover; authenticated `tools/list` on the actual endpoint applies its rollout and account gates.
 
 V2 defines six tools: `clifton_ask`, `clifton_get_response`, `clifton_search`, `clifton_retrieve`, `clifton_list_vault_files`, and `clifton_get_vault_file`. A caller may see fewer because of access or rollout gates. Agent tools are unavailable in v2; use the [Clifton console](https://console.cliftonapi.com) for agents and reports.
 
@@ -146,7 +146,7 @@ A successful acknowledgement has `structuredContent`:
 
 Use only returned identifiers. If the connection fails before you receive them, report an uncertain outcome with the request reference when available. **Do not invent IDs or automatically resubmit the question:** a new ask can create a second task and charge.
 
-The acknowledgement saves and returns the resolved `model` and `effort`, including their defaults. To resume a Deep Thinking turn in `needs_input` or `paused`, resend that exact saved pair, its returned `session_id` and `message_id`, and the original `response_format` if one was supplied. Omitting the fields requests Instant/medium; it does not recover the paused turn's settings. A different pair is refused before a new execution. A completed follow-up uses `session_id` without `message_id`, starts a new turn, and may choose a different pair.
+The acknowledgement saves and returns the resolved `model` and `effort`, including their defaults. To resume any saved turn in `needs_input` or `paused`, resend that exact saved pair, its returned `session_id` and `message_id`, and the original `response_format` if one was supplied. Omitting the fields requests Instant/medium; it does not recover the paused turn's settings. A different pair is refused before a new execution. A completed follow-up uses `session_id` without `message_id`, starts a new turn, and may choose a different pair.
 
 An ask refusal sets `isError:true`. Read machine-readable details from the first JSON text content block rather than assuming a successful `structuredContent` receipt exists. Argument errors include `code: "invalid_arguments"` and `validation_errors`; other bounded refusals carry their code and any details in that JSON block.
 

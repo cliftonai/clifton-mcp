@@ -1,7 +1,7 @@
 # <img src="assets/logo-square.png" alt="Clifton" width="32" height="32" align="middle"> Clifton MCP
 
 [![Build](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.1.3-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
@@ -10,7 +10,9 @@ Clifton exposes MCP tools for markets and finance research, raw structured data 
 ![Clifton answering a financial research question in Claude](assets/demo.gif)
 
 
-**Endpoint:** `https://ai.cliftonapi.com/v2/mcp`
+**Live plugin endpoint:** `https://ai.cliftonapi.com/v1/mcp`
+
+**V2 preview endpoint (not live):** `https://ai.cliftonapi.com/v2/mcp`
 
 **Release status:** these docs describe unreleased MCP v2. The existing MCP stays available while v2 is tested separately. Keep your existing connection until all v2 tools are tested and the cutover is approved. [Release notes](CHANGELOG.md#020---unreleased).
 
@@ -20,9 +22,9 @@ Clifton exposes MCP tools for markets and finance research, raw structured data 
 
 `model` selects `instant` (the default) or `deep-thinking` when enabled for an OAuth caller. `effort` independently selects `extra_low`, `low`, `medium` (the default), `high`, `extra_high`, or `ultra`. API-key callers use Instant with any of the six effort levels. Saved responses report both choices; resuming the same message requires that saved pair and the returned IDs. [Model, effort, and continuation details](API.md#clifton_ask-starts-one-answer).
 
-### Claude Desktop, Claude Web, ChatGPT Desktop, ChatGPT Web
+### V2 host setup — validation pending
 
-In Claude Desktop or Web, add a custom connector. In ChatGPT Desktop, add an HTTP MCP server and select **Authenticate**. In ChatGPT Web, create a custom MCP connection in Developer mode. Use this server URL:
+The browser/Desktop flows below have not passed v2 host acceptance; these are preview setup notes, not a supported-host claim. Do not replace an existing live connection. In Claude Desktop or Web, add a custom connector. Use ChatGPT Web's custom-plugin setup where your account permits it; ChatGPT Desktop has not been verified. Use this server URL:
 
 ```text
 https://ai.cliftonapi.com/v2/mcp
@@ -39,11 +41,11 @@ Sign in with your Clifton account for OAuth connections. ChatGPT Web requires an
 /plugin install clifton-mcp@clifton-mcp
 ```
 
-On first use, Claude Code connects to Clifton over OAuth. No Client ID is required. Then ask:
+The packaged plugin remains on v1 until the separately approved live cutover. On first use, Claude Code connects to Clifton over OAuth. No Client ID is required. Then ask:
 
 > What was NVDA's most recent reported quarterly revenue?
 
-The plugin also adds a [`clifton-research` skill](plugins/clifton-mcp/skills/clifton-research/SKILL.md) that routes finance questions and Data Vault requests to the matching Clifton tools.
+The plugin adds a [`clifton-research` skill](plugins/clifton-mcp/skills/clifton-research/SKILL.md) for the current v1 ask and Vault-listing contract. The six-tool reference below describes v2 preview behavior.
 
 ### Cursor, Codex, Manual Claude Code
 

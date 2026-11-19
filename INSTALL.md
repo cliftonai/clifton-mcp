@@ -2,7 +2,7 @@
 
 Use Clifton for markets and finance research and authorized Data Vault file discovery and downloads. You need a [Clifton account](https://console.cliftonapi.com).
 
-These instructions describe unreleased MCP v2. Keep the existing MCP connection until all v2 tools are tested and the cutover is approved. After that cutover, every setup uses this MCP server URL:
+The packaged Claude Code plugin still uses the live v1 endpoint and its v1 instructions. The manual setup instructions below describe unreleased MCP v2; browser/Desktop host acceptance is pending. Keep the existing MCP connection until all v2 tools are tested and the cutover is approved. After that cutover, every setup uses this MCP server URL:
 
 ```text
 https://ai.cliftonapi.com/v2/mcp
@@ -16,12 +16,14 @@ Choose your app. **OAuth** means signing in with your Clifton account in a brows
 | --- | --- |
 | [Claude Desktop](#claude-desktop) | Custom connector, OAuth |
 | [Claude Web](#claude-web) | Custom connector, OAuth |
-| [ChatGPT Desktop](#chatgpt-desktop) | Streamable HTTP, OAuth |
-| [ChatGPT Web](#chatgpt-web) | Developer mode, OAuth |
+| [ChatGPT Desktop](#chatgpt-desktop) | Not verified; use web setup |
+| [ChatGPT Web](#chatgpt-web) | Custom plugin, OAuth; workspace policy applies |
 
 Developer tools: [Claude Code](#claude-code), [Codex](#codex), and [Cursor](#cursor).
 
 ## Claude Desktop
+
+V2 acceptance: **pending**; setup notes below are not a verified support claim.
 
 1. Open **Customize → Connectors → + → Add custom connector**. Some versions put **Connectors** under **Settings**.
 2. Enter **Name:** `Clifton` and **Remote MCP server URL:** `https://ai.cliftonapi.com/v2/mcp`. Leave optional OAuth client fields empty.
@@ -34,34 +36,28 @@ Developer tools: [Claude Code](#claude-code), [Codex](#codex), and [Cursor](#cur
 
 ## Claude Web
 
+V2 acceptance: **pending**.
+
 Open [claude.ai](https://claude.ai) and follow the [Claude Desktop steps](#claude-desktop): **Customize → Connectors → + → Add custom connector**, using the same Clifton name, URL, and sign-in.
 
 If you already connected Clifton in Claude Desktop with the same Claude account, enable it from **+ → Connectors** in your web chat. You do not need to add it again. [Anthropic's desktop and web guide](https://support.claude.com/en/articles/11725091-when-to-use-desktop-and-web-connectors)
 
 ## ChatGPT Desktop
 
-1. Open **Settings → MCP servers → Add server** (called **Connect to a custom MCP** in some versions).
-2. Select **Streamable HTTP**. Enter **Name:** `clifton` and **URL:** `https://ai.cliftonapi.com/v2/mcp`. Leave API-key headers and optional OAuth client fields empty.
-3. Save, select **Authenticate**, and sign in with your Clifton account in the browser.
-4. Return to the app, select **Restart** if prompted, and [try a question](#check-the-connection).
-
-**API-key alternative:** add the `X-API-Key` header with your Clifton API key instead of authenticating with OAuth. If your app has no header editor, use the [configuration example](examples/codex.md#api-key).
-
-If your app has no MCP server settings, use [ChatGPT Web](#chatgpt-web). Clifton uses an HTTP URL, so leave STDIO command fields empty. The desktop app and Codex CLI share local MCP configuration; Web setup is separate. [OpenAI's MCP guide](https://learn.chatgpt.com/docs/extend/mcp)
+V2 acceptance: **pending**. Clifton has not verified a custom-MCP setup path in ChatGPT Desktop. Use [ChatGPT Web](#chatgpt-web); do not assume the ChatGPT app shares Codex's MCP configuration.
 
 ## ChatGPT Web
 
-Create a custom MCP connection on [chatgpt.com](https://chatgpt.com). Developer mode is available on eligible paid accounts, subject to workspace policy.
+V2 acceptance: **pending**; an eligible account and workspace permission are required. The current [OpenAI connection guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) describes web setup and plan-specific permissions.
 
-1. Open **Settings → Security and login** and enable **Developer mode**. If unavailable, check your account eligibility or ask your workspace administrator.
-2. Open [Plugins](https://chatgpt.com/plugins) and select **+** to add a developer-mode app.
-3. Enter **Name:** `Clifton`, **Description:** `Markets and finance research`, and **MCP server URL:** `https://ai.cliftonapi.com/v2/mcp`.
-4. Choose **OAuth**. Leave optional client ID and secret empty; if asked for a registration method, choose **Dynamic Client Registration (DCR)**. Create the connection and complete Clifton sign-in when prompted.
-5. In a new chat, choose **+ → Developer mode**, select Clifton, and [try a question](#check-the-connection).
+1. Open [Plugins](https://chatgpt.com/plugins), select **+**, then **Add custom MCP server**. The current Plugins flow does not require enabling Developer Mode first; older interfaces may differ.
+2. Enter **Name:** `Clifton` and the v2 preview URL `https://ai.cliftonapi.com/v2/mcp` only after cutover. Choose **OAuth**; leave optional client credentials empty when Dynamic Client Registration is offered.
+3. Review the requested access and the app's risk warning, then create the plugin and complete Clifton sign-in. Your account or workspace may require an administrator to do this.
+4. Review the discovered tools. In a new conversation, select the plugin with **@** and [check answer delivery](#check-the-connection).
 
 MCP v2 has no agent creation or deletion tools. Manage agents in the [Clifton console](https://console.cliftonapi.com).
 
-If sign-in fails, send [support](SUPPORT.md) the error. [OpenAI's Developer mode guide](https://developers.openai.com/api/docs/guides/developer-mode) · [Connection walkthrough](https://developers.openai.com/plugins/deploy/connect-chatgpt)
+If sign-in fails, send [support](SUPPORT.md) the error. Never send passwords or tokens.
 
 ## Developer tools
 
@@ -82,7 +78,7 @@ For manual OAuth or API-key setup, see [Claude Code examples](examples/claude-co
 
 ### Codex
 
-**Desktop:** use the [ChatGPT Desktop server settings](#chatgpt-desktop).
+**Desktop:** Codex is a separate product from ChatGPT. Use the MCP configuration supported by your Codex version; do not assume ChatGPT Desktop settings apply.
 
 **CLI:** add the server and sign in:
 
@@ -107,7 +103,7 @@ Start a new chat and ask:
 
 > Use Clifton to find NVIDIA's most recent reported quarterly revenue and cite the source.
 
-Check that the app actually calls **`clifton_ask`** and returns a sourced answer. A response that merely lists tool names does not prove the connection works.
+For v2, confirm that **`clifton_ask`** returns server-issued IDs, the host waits `poll_after_seconds`, and **`clifton_get_response`** with those exact IDs eventually returns a completed sourced answer. Stop on failures or action-needed states; do not automatically resubmit an uncertain ask. A receipt, tool-name list, or Connected badge alone does not prove answer delivery. The current v1 plugin returns its answer through `clifton_ask` and does not use v2 polling.
 
 Available tools depend on your account and authentication method. See [API.md](API.md) for research, search/retrieve, and Data Vault tools.
 
