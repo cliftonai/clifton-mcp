@@ -61,7 +61,7 @@ X-API-Key: <your-api-key>
 
 Config snippets live in [`examples/`](examples/).
 
-## Tools
+## V2 preview tools
 
 - **`clifton_ask`** — starts a saved markets or finance request and returns its session/message IDs.
 - **`clifton_get_response`** — reads the current saved state for those exact IDs, with the answer and citations when complete. Stop polling on completion or when action is required.

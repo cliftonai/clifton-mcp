@@ -17,4 +17,4 @@ Use `https://ai.cliftonapi.com/v1/mcp` as the remote HTTP endpoint in a host tha
 
 For exact v1 arguments and its historical per-host setup, see the [pinned v1 API reference](https://github.com/cliftonai/clifton-mcp/blob/346c08995539fea38a5192835dcb69d9ee4e172c/API.md). Those older host-specific screens may differ from your installed version. The [v2 installation guide](INSTALL.md) is for a later cutover, not current setup.
 
-Use the Clifton console for recurring agents. This plugin does not advertise or invoke MCP agent-management tools.
+Use the Clifton console for recurring agents. The plugin skill directs agent requests to the console and forbids invoking MCP agent-management tools; a cached or current v1 server may still list them.

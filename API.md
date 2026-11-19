@@ -323,7 +323,7 @@ A missing, expired, non-ready, or inaccessible file produces the same `vault_fil
 | A submission returns `status: running` | The request is accepted and saved. | Wait `poll_after_seconds` seconds, then call `clifton_get_response` using its exact session and message IDs. |
 | Tool not found on `tools/call` (`METHOD_NOT_FOUND`) | Tool not in the currently-enabled set. | Confirm via `tools/list`; only currently-enabled tools respond. |
 | OAuth completes but `tools/call` returns 401 | The access token's identity claim could not be resolved. | Re-run sign-in; if persistent, contact support with the trace details. |
-| `Automatic client registration isn't supported` in Claude Web | Client tried DCR against the wrong endpoint. | Update the connector URL to `https://ai.cliftonapi.com/v2/mcp`; the DCR shim handles registration. |
+| `Automatic client registration isn't supported` in Claude Web | Client tried DCR against the wrong endpoint. | Use the intended endpoint (`https://ai.cliftonapi.com/v1/mcp` today; `/v2/mcp` only after live cutover); its DCR shim handles registration. |
 | Connector "redirect_mismatch" during OAuth | The sign-in callback was rejected. | Reconnect Clifton. If it persists, contact support with your app name and the error text. |
 
 For unresolved issues, include the `X-Request-Id` from the failing response and the host you were using.

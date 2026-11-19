@@ -1,6 +1,6 @@
 ---
 name: clifton-research
-description: Use Clifton for markets and finance questions about stocks, ETFs, crypto, bonds, options, macro data, SEC filings, earnings, transcripts, analyst ratings, screening, company comparisons, and uploaded Clifton Data Vault files. Calls clifton_ask and clifton_list_vault_files on the bundled clifton MCP server.
+description: Use Clifton for markets and finance questions about stocks, ETFs, crypto, bonds, options, macro data, SEC filings, earnings, transcripts, analyst ratings, screening, company comparisons, and uploaded Clifton Data Vault files. Also use for Clifton agent or report requests to direct the user to the console instead of invoking MCP agent tools. Calls clifton_ask and clifton_list_vault_files on the bundled clifton MCP server.
 ---
 
 # Clifton Research & Data Vault
