@@ -1,7 +1,7 @@
 # <img src="assets/logo-square.png" alt="Clifton" width="32" height="32" align="middle"> Clifton MCP
 
 [![Build](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.1.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
@@ -10,31 +10,35 @@ Clifton exposes MCP tools for markets and finance research, raw structured data 
 ![Clifton answering a financial research question in Claude](assets/demo.gif)
 
 
-**Live plugin endpoint:** `https://ai.cliftonapi.com/v1/mcp`
+**Endpoint:** `https://ai.cliftonapi.com/v2/mcp`
 
-**V2 preview endpoint (not live):** `https://ai.cliftonapi.com/v2/mcp`
+## Upgrading from v1
 
-**Release status:** these docs describe unreleased MCP v2. The existing MCP stays available while v2 is tested separately. Keep your existing connection until all v2 tools are tested and the cutover is approved. [Release notes](CHANGELOG.md#020---unreleased).
+MCP v2 is live and `/v1/mcp` is retired. The old endpoint now only returns an upgrade notice; it runs no tools.
 
-## Current live access
+- **Manual connections:** change the URL from `/v1/mcp` to `/v2/mcp`, reconnect, and refresh the tool list.
+- **Claude Code plugin:** update `clifton-mcp` to 0.2.0, then restart Claude Code or reconnect with `/mcp`.
+- Do not add a second Clifton connection. Agent tools are gone in v2; existing agents and reports remain in the [Clifton console](https://console.cliftonapi.com).
 
-Use [the live v1 connection guide](LIVE.md) for a new connection today. The plugin below stays on v1.
+[Release notes](CHANGELOG.md#020---2026-11-19).
 
-## V2 preview
+## How answers work
 
-`clifton_ask` on MCP v2 acknowledges a saved research request before its answer is ready. Your app waits `poll_after_seconds` (currently ten seconds), then uses `clifton_get_response` to read the current saved state. Each read returns as soon as storage completes; while running, your app waits again before its next read. This requires the app's own timing facility; hosts without one remain unvalidated for this flow. After the approved cutover, update existing connections to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
+`clifton_ask` acknowledges a saved research request before its answer is ready. Your app waits `poll_after_seconds` (currently ten seconds), then uses `clifton_get_response` to read the current saved state. Each read returns as soon as storage completes; while running, your app waits again before its next read. This requires the app's own timing facility; hosts without one remain unvalidated for this flow. [Protocol details](API.md).
 
-`model` selects `instant` (the default) or `deep-thinking` when enabled for an OAuth caller. `effort` independently selects `extra_low`, `low`, `medium` (the default), `high`, `extra_high`, or `ultra`. API-key callers use Instant with any of the six effort levels. Saved responses report both choices; resuming the same message requires that saved pair and the returned IDs. [Model, effort, and continuation details](API.md#clifton_ask-starts-one-answer).
+`model` defaults to `instant`. Production currently serves Instant only; Deep Thinking will appear in `tools/list` when it is enabled for MCP. `effort` selects `extra_low`, `low`, `medium` (the default), `high`, or `extra_high`. MCP does not offer `ultra`. Saved responses report both choices; resuming the same message requires that saved pair and the returned IDs. [Model, effort, and continuation details](API.md#clifton_ask-starts-one-answer).
 
-### V2 host setup — validation pending
+## Connect
 
-The browser/Desktop flows below have not passed v2 host acceptance; these are preview setup notes, not a supported-host claim. Do not replace an existing live connection. In Claude Desktop or Web, add a custom connector. Use ChatGPT Web's custom-plugin setup where your account permits it; ChatGPT Desktop has not been verified. After the announced live cutover, use this server URL:
+### Claude Desktop, Claude Web, ChatGPT Web
+
+Add a custom connector in Claude Desktop or Web. Use ChatGPT Web's custom-plugin setup where your account permits it; ChatGPT Desktop has not been verified. Use this server URL:
 
 ```text
 https://ai.cliftonapi.com/v2/mcp
 ```
 
-Sign in with your Clifton account for OAuth connections. ChatGPT Web requires an eligible account and workspace permission.
+Sign in with your Clifton account. ChatGPT Web requires an eligible account and workspace permission. These are supported setups, but they have not been separately acceptance-tested on v2; Claude Code over OAuth has been tested end to end.
 
 **Step-by-step setup for each host →** [INSTALL.md](INSTALL.md)
 
@@ -45,11 +49,11 @@ Sign in with your Clifton account for OAuth connections. ChatGPT Web requires an
 /plugin install clifton-mcp@clifton-mcp
 ```
 
-The packaged plugin remains on v1 until the separately approved live cutover. On first use, Claude Code connects to Clifton over OAuth. No Client ID is required. Then ask:
+On first use, Claude Code connects to Clifton over OAuth. No Client ID is required. Then ask:
 
 > What was NVDA's most recent reported quarterly revenue?
 
-The plugin adds a [`clifton-research` skill](plugins/clifton-mcp/skills/clifton-research/SKILL.md) for the current v1 ask and Vault-listing contract. The six-tool reference below describes v2 preview behavior.
+The plugin adds a [`clifton-research` skill](plugins/clifton-mcp/skills/clifton-research/SKILL.md) that covers asking and polling, direct data, and Vault downloads.
 
 ### Cursor, Codex, Manual Claude Code
 
@@ -61,7 +65,7 @@ X-API-Key: <your-api-key>
 
 Config snippets live in [`examples/`](examples/).
 
-## V2 preview tools
+## Tools
 
 - **`clifton_ask`** — starts a saved markets or finance request and returns its session/message IDs.
 - **`clifton_get_response`** — reads the current saved state for those exact IDs, with the answer and citations when complete. Stop polling on completion or when action is required.

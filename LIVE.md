@@ -1,6 +1,12 @@
-# Live v1 connection
+# Live connection
 
-The packaged plugin currently uses `https://ai.cliftonapi.com/v1/mcp`. The six-tool v2 reference is a preview; do not replace this live address until the live cutover is announced.
+The live Clifton MCP endpoint is:
+
+```text
+https://ai.cliftonapi.com/v2/mcp
+```
+
+Setup for each app is in [INSTALL.md](INSTALL.md). The tool reference is in [API.md](API.md), and the overview is in the [README](README.md).
 
 ## Claude Code plugin
 
@@ -9,12 +15,10 @@ The packaged plugin currently uses `https://ai.cliftonapi.com/v1/mcp`. The six-t
 /plugin install clifton-mcp@clifton-mcp
 ```
 
-Use `/mcp` to sign in. Ask a finance question and confirm `clifton_ask` returns its answer. The current v1 plugin does not use the v2 `clifton_get_response` flow.
+Use `/mcp` to sign in. Ask a finance question and confirm that `clifton_ask` returns session and message IDs and `clifton_get_response` later returns a completed, sourced answer.
 
-## Manual connection
+## Upgrading from v1
 
-Use `https://ai.cliftonapi.com/v1/mcp` as the remote HTTP endpoint in a host that supports it. Authenticate with OAuth, or supply your existing Clifton API key through the host's secret/header configuration. Follow your workspace's connector permissions; a host's Connected badge alone is not a successful answer test.
+The v1 endpoint is retired and only returns an upgrade notice. Change an existing connection's URL to `/v2/mcp`, then reconnect and refresh its tools. Plugin users update `clifton-mcp` to 0.2.0 and restart or reconnect. Do not add a second Clifton connection.
 
-For exact v1 arguments and its historical per-host setup, see the [pinned v1 API reference](https://github.com/cliftonai/clifton-mcp/blob/346c08995539fea38a5192835dcb69d9ee4e172c/API.md). Those older host-specific screens may differ from your installed version. The [v2 installation guide](INSTALL.md) is for a later cutover, not current setup.
-
-Use the Clifton console for recurring agents. The plugin skill directs agent requests to the console and forbids invoking MCP agent-management tools; a cached or current v1 server may still list them.
+Agent tools are not available in v2. Use the [Clifton console](https://console.cliftonapi.com) for recurring agents and reports.

@@ -1,13 +1,13 @@
-# ChatGPT Web — preview connection settings
+# ChatGPT Web — connection settings
 
-**V2 PREVIEW ONLY:** do not apply this v2 configuration before live cutover. For current access use [the live v1 connection](../LIVE.md). Host acceptance remains pending unless explicitly recorded.
+Upgrading from v1? Change an existing `/v1/mcp` URL to `/v2/mcp` and reconnect instead of adding a second connection.
 
-V2 host acceptance is pending. Follow the current [OpenAI connection guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) and your workspace policy. In the current Plugins flow, use **+ → Add custom MCP server**; enabling Developer Mode first is not required.
+This setup is supported but has not been separately acceptance-tested on v2. Follow the current [OpenAI connection guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) and your workspace policy. In the current Plugins flow, use **+ → Add custom MCP server**; enabling Developer Mode first is not required.
 
 - **Name:** `Clifton`
-- **MCP server URL after cutover:** `https://ai.cliftonapi.com/v2/mcp`
+- **MCP server URL:** `https://ai.cliftonapi.com/v2/mcp`
 - **Authentication:** OAuth. Leave optional client credentials empty when Dynamic Client Registration is offered.
 
-Review the requested access before creating a connection. Do not replace your live v1 connection while v2 is a preview.
+Review the requested access before creating a connection.
 
 Full setup: [ChatGPT Web](../INSTALL.md#chatgpt-web). ChatGPT Desktop has not been verified; it does not share Codex's configuration by assumption.

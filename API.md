@@ -1,7 +1,5 @@
 # Clifton MCP — Developer Reference
 
-**V2 PREVIEW ONLY:** use [the live v1 connection](LIVE.md) today. All v2 URLs and manual configurations below are for after the announced live cutover.
-
 Technical reference for connecting an MCP host to Clifton. Use this for Claude Code, Claude Desktop, Claude Web, Codex, Cursor, ChatGPT, or a custom MCP client.
 
 > Looking for end-user setup ("paste this URL into Claude")? See [INSTALL.md](INSTALL.md).
@@ -12,13 +10,13 @@ Technical reference for connecting an MCP host to Clifton. Use this for Claude C
 
 `https://ai.cliftonapi.com/v2/mcp`
 
-This reference describes unreleased v2. Keep the existing MCP available while v2 is tested separately; cutover requires all v2 tools to pass testing and separate approval. See the [release hold](CHANGELOG.md#020---unreleased).
+This is the live MCP v2 endpoint. The former `/v1/mcp` endpoint is retired: `initialize` reports the server as `Clifton (upgrade required)` with instructions to switch to `/v2/mcp`, and every tool call returns `mcp_upgrade_required` with an `upgrade_url`. It runs no tools or models. To upgrade, change the connection URL to `/v2/mcp`, reconnect, and refresh tools; plugin users update `clifton-mcp` to 0.2.0. See the [release notes](CHANGELOG.md#020---2026-11-19).
 
 - **Transport:** Streamable HTTP (MCP `2025-06-18`; `2025-03-26` accepted for client back-compat).
 - **Protocol:** JSON-RPC 2.0 single-request per POST. Batch arrays are **not** supported.
 - **Region:** us-east-2.
 
-The public snapshot at `https://ai.cliftonapi.com/.well-known/mcp-tools.json` describes the currently live build, not this unreleased v2 preview. Authenticated `tools/list` on the endpoint being tested is authoritative for that caller.
+Authenticated `tools/list` on the endpoint is authoritative for each caller.
 
 ---
 
@@ -38,13 +36,13 @@ Standard OAuth 2.1 with PKCE. Clifton's authorization endpoints support Dynamic 
 
 | Endpoint | URL |
 |---|---|
-| Protected-resource metadata | `https://ai.cliftonapi.com/.well-known/oauth-protected-resource` (RFC 9728) |
+| Protected-resource metadata | `https://ai.cliftonapi.com/.well-known/oauth-protected-resource/v2/mcp` (RFC 9728) |
 | Authorization-server metadata | `https://ai.cliftonapi.com/.well-known/oauth-authorization-server` (RFC 8414) |
 | Dynamic Client Registration | `POST https://ai.cliftonapi.com/oauth/register` (RFC 7591) |
 | Authorize | `https://ai.cliftonapi.com/oauth/authorize` |
 | Token | `https://ai.cliftonapi.com/oauth/token` |
 
-Tokens are JWTs. Pass as `Authorization: Bearer <jwt>`. Audience is `client_id`; identity (`username`, `organization_id`) is resolved server-side from the user's profile.
+Requested scopes are `openid`, `email`, and `profile`. Tokens are JWTs. Pass as `Authorization: Bearer <jwt>`. Audience is `client_id`; identity (`username`, `organization_id`) is resolved server-side from the user's profile.
 
 PKCE-only (no client secrets). Refresh tokens are accepted at the token endpoint.
 
@@ -61,7 +59,7 @@ PKCE-only (no client secrets). Refresh tokens are accepted at the token endpoint
 /plugin install clifton-mcp@clifton-mcp
 ```
 
-The packaged plugin still connects to live v1, not this v2 preview. Its instructions link to the matching v1 API contract. No API key is required; Claude Code registers through OAuth/DCR on first use.
+The plugin connects to `https://ai.cliftonapi.com/v2/mcp`. No API key is required; Claude Code registers through OAuth/DCR on first use.
 
 **Or, manual with an API key:**
 
@@ -107,9 +105,7 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 
 ## Available tools
 
-> **Preview contract:** the six-tool summary below describes v2. The public snapshot describes the live build until cutover; authenticated `tools/list` on the actual endpoint applies its rollout and account gates.
-
-V2 defines six tools: `clifton_ask`, `clifton_get_response`, `clifton_search`, `clifton_retrieve`, `clifton_list_vault_files`, and `clifton_get_vault_file`. A caller may see fewer because of access or rollout gates. Agent tools are unavailable in v2; use the [Clifton console](https://console.cliftonapi.com) for agents and reports.
+V2 serves six tools: `clifton_ask`, `clifton_get_response`, `clifton_search`, `clifton_retrieve`, `clifton_list_vault_files`, and `clifton_get_vault_file`. A caller may see fewer because of access or rollout gates. Agent tools are unavailable in v2; use the [Clifton console](https://console.cliftonapi.com) for agents and reports.
 
 ### `clifton_ask` *(starts one answer)*
 
@@ -118,8 +114,8 @@ Submit a markets or finance question. Clifton saves the turn before returning it
 | Input | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `message` | string | yes | Question or task. |
-| `model` | `instant` or `deep-thinking` | no | Defaults to `instant`. Deep Thinking requires OAuth and server activation for the caller. API-key callers are Instant-only. |
-| `effort` | `extra_low`, `low`, `medium`, `high`, `extra_high`, or `ultra` | no | Defaults to `medium`. All six depths are available within each permitted model, including Instant for API-key callers. |
+| `model` | `instant` or `deep-thinking` | no | Defaults to `instant`. Production currently offers `instant` only; `deep-thinking` appears in `tools/list` when it is enabled. Deep Thinking requires OAuth and server activation for the caller. API-key callers are Instant-only. |
+| `effort` | `extra_low`, `low`, `medium`, `high`, or `extra_high` | no | Defaults to `medium`. MCP does not offer `ultra`. Each depth applies within each permitted model. |
 | `session_id` | string | no | Exact returned session ID for a follow-up; omit on the first call. |
 | `message_id` | string | resume only | Exact returned message ID when answering `needs_input` or resuming `paused`. Omit for an ordinary new follow-up. |
 | `response_format` | object | no | Feature-gated JSON Schema envelope. Resend on a continuation that requires structured output. |
@@ -127,7 +123,7 @@ Submit a markets or finance question. Clifton saves the turn before returning it
 | `attachments` | string[] | no | Authorized Clifton Data Vault file IDs found with `clifton_list_vault_files`. |
 | `context` | object | no | Host context; never identity or authority. |
 
-Model and effort are independent: Instant with `ultra` remains Instant; Deep Thinking with `extra_low` remains Deep Thinking. Both fields are optional strings, not nullable. Omitting either applies its default anew, rather than inheriting a previous turn's choice. Use the exact wire spellings above: `model: "research"`, the old `effort: "instant"` or `effort: "research"`, and spaced or provider-specific effort names are not accepted by v2. Refresh discovery when upgrading from an older contract; the old live MCP retains its contract until approved cutover.
+Model and effort are independent: Instant with `extra_high` remains Instant; Deep Thinking with `extra_low` remains Deep Thinking. Both fields are optional strings, not nullable. Omitting either applies its default anew, rather than inheriting a previous turn's choice. Use the exact wire spellings above: `model: "research"`, the old `effort: "instant"` or `effort: "research"`, and spaced or provider-specific effort names are not accepted by v2. Refresh discovery when upgrading from v1.
 
 MCP v2 does not accept `incognito`. Unknown or foreign session identifiers are not permission to read another conversation.
 
@@ -174,7 +170,7 @@ Errors set `isError`; inspect the first JSON text content block for machine-read
 
 ### Direct public data
 
-| V2 preview tool | Public endpoint |
+| Tool | Public endpoint |
 | --- | --- |
 | `clifton_search` | `/v3/search` |
 | `clifton_retrieve` | `/v3/retrieve` |
@@ -309,7 +305,7 @@ A missing, expired, non-ready, or inaccessible file produces the same `vault_fil
 
 ## Execution and limits
 
-- `model` selects Instant or Deep Thinking; `effort` selects a standard depth within that model. Defaults are Instant/medium. Deep Thinking remains OAuth-only and gated; discover the schema and eligibility through authenticated `tools/list`.
+- `model` selects Instant or Deep Thinking; `effort` selects a standard depth within that model. Defaults are Instant/medium. Production currently serves Instant only. Deep Thinking remains OAuth-only and gated; discover the schema and eligibility through authenticated `tools/list`. MCP does not offer `ultra` effort.
 - MCP does not impose its former short execution cap. MCP Instant uses the selected model maximum when it raises the ordinary default (currently 300 seconds); Deep Thinking retains its configured default (currently 720 seconds). These configured values remain subject to cost, available credit, cumulative message budgets and the Router invocation deadline. Changing effort does not grant a larger time or cost allowance. Other callers' defaults remain unchanged.
 - Acknowledgement and final completion are separate. Losing the host connection after acknowledgement does not itself stop the Router's retained execution.
 - Questions and pauses require action; polling alone cannot finish them. A same-message resume must match the saved model/effort pair and preserves the original message's cumulative budget. Omitted values apply the defaults, not the saved choices.
@@ -324,11 +320,11 @@ A missing, expired, non-ready, or inaccessible file produces the same `vault_fil
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `401 Unauthorized` immediately on any RPC | Missing or wrong `X-API-Key` / `Authorization` header. | Verify the key is current; for OAuth, complete the auth flow before issuing tool calls. |
-| `mcp_upgrade_required` from the old endpoint | The connection uses `/v1/mcp`. | Update it to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh tools. |
+| `mcp_upgrade_required` from the old endpoint | The connection uses the retired `/v1/mcp`. | Update it to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh tools. Plugin users update `clifton-mcp` to 0.2.0. |
 | A submission returns `status: running` | The request is accepted and saved. | Wait `poll_after_seconds` seconds, then call `clifton_get_response` using its exact session and message IDs. |
 | Tool not found on `tools/call` (`METHOD_NOT_FOUND`) | Tool not in the currently-enabled set. | Confirm via `tools/list`; only currently-enabled tools respond. |
 | OAuth completes but `tools/call` returns 401 | The access token's identity claim could not be resolved. | Re-run sign-in; if persistent, contact support with the trace details. |
-| `Automatic client registration isn't supported` in Claude Web | Client tried DCR against the wrong endpoint. | Use the intended endpoint (`https://ai.cliftonapi.com/v1/mcp` today; `/v2/mcp` only after live cutover); its DCR shim handles registration. |
+| `Automatic client registration isn't supported` in Claude Web | Client tried DCR against the wrong endpoint. | Use `https://ai.cliftonapi.com/v2/mcp`; its DCR shim handles registration. |
 | Connector "redirect_mismatch" during OAuth | The sign-in callback was rejected. | Reconnect Clifton. If it persists, contact support with your app name and the error text. |
 
 For unresolved issues, include the `X-Request-Id` from the failing response and the host you were using.
@@ -337,7 +333,6 @@ For unresolved issues, include the `X-Request-Id` from the failing response and 
 
 ## Further reading
 
-- Public tool contract: `https://ai.cliftonapi.com/.well-known/mcp-tools.json`
-- OAuth protected-resource metadata: `https://ai.cliftonapi.com/.well-known/oauth-protected-resource`
+- OAuth protected-resource metadata: `https://ai.cliftonapi.com/.well-known/oauth-protected-resource/v2/mcp`
 - Customer setup walkthrough: [INSTALL.md](INSTALL.md)
 - Common host issues: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)

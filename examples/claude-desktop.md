@@ -1,6 +1,6 @@
 # Claude Desktop — config snippet
 
-**V2 PREVIEW ONLY:** do not apply this v2 configuration before live cutover. For current access use [the live v1 connection](../LIVE.md). Host acceptance remains pending unless explicitly recorded.
+Upgrading from v1? Change an existing `/v1/mcp` URL to `/v2/mcp` and reconnect instead of adding a second connection.
 
 OAuth — no API key. Add a custom connector:
 
