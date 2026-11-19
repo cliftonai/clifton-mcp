@@ -174,6 +174,11 @@ Errors set `isError`; inspect the first JSON text content block for machine-read
 
 ### Direct public data
 
+| V2 preview tool | Public endpoint |
+| --- | --- |
+| `clifton_search` | `/v3/search` |
+| `clifton_retrieve` | `/v3/retrieve` |
+
 Use `clifton_search` for explicit raw structured data through public
 `POST /v3/search`, and `clifton_retrieve` for ranked document retrieval through
 public `POST /v3/retrieve`. Analysis and ordinary sourced answers continue to
