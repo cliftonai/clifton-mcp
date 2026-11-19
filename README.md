@@ -1,7 +1,7 @@
 # <img src="assets/logo-square.png" alt="Clifton" width="32" height="32" align="middle"> Clifton MCP
 
 [![Build](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.1.3-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
@@ -15,6 +15,10 @@ Clifton exposes MCP tools for markets and finance research, raw structured data 
 **V2 preview endpoint (not live):** `https://ai.cliftonapi.com/v2/mcp`
 
 **Release status:** these docs describe unreleased MCP v2. The existing MCP stays available while v2 is tested separately. Keep your existing connection until all v2 tools are tested and the cutover is approved. [Release notes](CHANGELOG.md#020---unreleased).
+
+## Activation draft — do not merge before backend promotion
+
+This branch prepares plugin 0.2.0 for `/v2/mcp`. It must not merge until the separately approved backend promotion and public endpoint checks are complete. The currently published 0.1.3 plugin remains on v1; the live-access and preview guidance below describes that published state. [Activation gates and validation scope](ACTIVATION.md).
 
 ## Current live access
 
