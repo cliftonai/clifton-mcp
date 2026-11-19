@@ -1,12 +1,16 @@
 # Connect Clifton to your AI app
 
-Use Clifton for markets and finance research, recurring agents, and authorized Data Vault files. You need a [Clifton account](https://console.cliftonapi.com).
+**V2 PREVIEW ONLY:** use [the live v1 connection](LIVE.md) today. All v2 URLs and manual configurations below are for after the announced live cutover.
 
-Every setup uses this MCP server URL:
+Use Clifton for markets and finance research and authorized Data Vault file discovery and downloads. You need a [Clifton account](https://console.cliftonapi.com).
+
+The packaged Claude Code plugin still uses the live v1 endpoint and its v1 instructions. The manual setup instructions below describe unreleased MCP v2; browser/Desktop host acceptance is pending. Keep the existing MCP connection until all v2 tools are tested and the cutover is approved. After that cutover, every setup uses this MCP server URL:
 
 ```text
-https://ai.cliftonapi.com/v1/mcp
+https://ai.cliftonapi.com/v2/mcp
 ```
+
+**Upgrading after the approved cutover:** change the existing connection's URL from `/v1/mcp` to `/v2/mcp`, then reconnect and refresh its tools. For the Claude Code plugin, update the `clifton-mcp` plugin and restart or reconnect it. Do not add a second Clifton connection. V2 supports research, search/retrieve, and Vault listing/downloads; agent tools are unavailable in v2.
 
 Choose your app. **OAuth** means signing in with your Clifton account in a browser. For an **API key**, create one under **Settings → API keys** in the Clifton console.
 
@@ -14,15 +18,17 @@ Choose your app. **OAuth** means signing in with your Clifton account in a brows
 | --- | --- |
 | [Claude Desktop](#claude-desktop) | Custom connector, OAuth |
 | [Claude Web](#claude-web) | Custom connector, OAuth |
-| [ChatGPT Desktop](#chatgpt-desktop) | Streamable HTTP, OAuth |
-| [ChatGPT Web](#chatgpt-web) | Developer mode, OAuth |
+| [ChatGPT Desktop](#chatgpt-desktop) | Not verified; use web setup |
+| [ChatGPT Web](#chatgpt-web) | Custom plugin, OAuth; workspace policy applies |
 
 Developer tools: [Claude Code](#claude-code), [Codex](#codex), and [Cursor](#cursor).
 
 ## Claude Desktop
 
+V2 acceptance: **pending**; setup notes below are not a verified support claim.
+
 1. Open **Customize → Connectors → + → Add custom connector**. Some versions put **Connectors** under **Settings**.
-2. Enter **Name:** `Clifton` and **Remote MCP server URL:** `https://ai.cliftonapi.com/v1/mcp`. Leave optional OAuth client fields empty.
+2. Enter **Name:** `Clifton` and **Remote MCP server URL:** `https://ai.cliftonapi.com/v2/mcp`. Leave optional OAuth client fields empty.
 3. Add the connector, select **Connect** if prompted, and sign in to Clifton.
 4. In a new chat, open **+ → Connectors**, enable Clifton, and [try a question](#check-the-connection).
 
@@ -32,34 +38,28 @@ Developer tools: [Claude Code](#claude-code), [Codex](#codex), and [Cursor](#cur
 
 ## Claude Web
 
+V2 acceptance: **pending**.
+
 Open [claude.ai](https://claude.ai) and follow the [Claude Desktop steps](#claude-desktop): **Customize → Connectors → + → Add custom connector**, using the same Clifton name, URL, and sign-in.
 
 If you already connected Clifton in Claude Desktop with the same Claude account, enable it from **+ → Connectors** in your web chat. You do not need to add it again. [Anthropic's desktop and web guide](https://support.claude.com/en/articles/11725091-when-to-use-desktop-and-web-connectors)
 
 ## ChatGPT Desktop
 
-1. Open **Settings → MCP servers → Add server** (called **Connect to a custom MCP** in some versions).
-2. Select **Streamable HTTP**. Enter **Name:** `clifton` and **URL:** `https://ai.cliftonapi.com/v1/mcp`. Leave API-key headers and optional OAuth client fields empty.
-3. Save, select **Authenticate**, and sign in with your Clifton account in the browser.
-4. Return to the app, select **Restart** if prompted, and [try a question](#check-the-connection).
-
-**API-key alternative:** add the `X-API-Key` header with your Clifton API key instead of authenticating with OAuth. If your app has no header editor, use the [configuration example](examples/codex.md#api-key).
-
-If your app has no MCP server settings, use [ChatGPT Web](#chatgpt-web). Clifton uses an HTTP URL, so leave STDIO command fields empty. The desktop app and Codex CLI share local MCP configuration; Web setup is separate. [OpenAI's MCP guide](https://learn.chatgpt.com/docs/extend/mcp)
+V2 acceptance: **pending**. Clifton has not verified a custom-MCP setup path in ChatGPT Desktop. Use [ChatGPT Web](#chatgpt-web); do not assume the ChatGPT app shares Codex's MCP configuration.
 
 ## ChatGPT Web
 
-Create a custom MCP connection on [chatgpt.com](https://chatgpt.com). Developer mode is available on eligible paid accounts, subject to workspace policy.
+V2 acceptance: **pending**; an eligible account and workspace permission are required. The current [OpenAI connection guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) describes web setup and plan-specific permissions.
 
-1. Open **Settings → Security and login** and enable **Developer mode**. If unavailable, check your account eligibility or ask your workspace administrator.
-2. Open [Plugins](https://chatgpt.com/plugins) and select **+** to add a developer-mode app.
-3. Enter **Name:** `Clifton`, **Description:** `Markets and finance research`, and **MCP server URL:** `https://ai.cliftonapi.com/v1/mcp`.
-4. Choose **OAuth**. Leave optional client ID and secret empty; if asked for a registration method, choose **Dynamic Client Registration (DCR)**. Create the connection and complete Clifton sign-in when prompted.
-5. In a new chat, choose **+ → Developer mode**, select Clifton, and [try a question](#check-the-connection).
+1. Open [Plugins](https://chatgpt.com/plugins), select **+**, then **Add custom MCP server**. The current Plugins flow does not require enabling Developer Mode first; older interfaces may differ.
+2. Enter **Name:** `Clifton` and the v2 preview URL `https://ai.cliftonapi.com/v2/mcp` only after cutover. Choose **OAuth**; leave optional client credentials empty when Dynamic Client Registration is offered.
+3. Review the requested access and the app's risk warning, then create the plugin and complete Clifton sign-in. Your account or workspace may require an administrator to do this.
+4. Review the discovered tools. In a new conversation, select the plugin with **@** and [check answer delivery](#check-the-connection).
 
-Clifton also offers tools that create or delete agents. Review the selected tools and any action confirmation before proceeding. See [Agent tools](AGENT-TOOLS.md).
+MCP v2 has no agent creation or deletion tools. Manage agents in the [Clifton console](https://console.cliftonapi.com).
 
-If sign-in fails, send [support](SUPPORT.md) the error. [OpenAI's Developer mode guide](https://developers.openai.com/api/docs/guides/developer-mode) · [Connection walkthrough](https://developers.openai.com/plugins/deploy/connect-chatgpt)
+If sign-in fails, send [support](SUPPORT.md) the error. Never send passwords or tokens.
 
 ## Developer tools
 
@@ -80,12 +80,12 @@ For manual OAuth or API-key setup, see [Claude Code examples](examples/claude-co
 
 ### Codex
 
-**Desktop:** use the [ChatGPT Desktop server settings](#chatgpt-desktop).
+**Desktop:** Codex is a separate product from ChatGPT. Use the MCP configuration supported by your Codex version; do not assume ChatGPT Desktop settings apply.
 
 **CLI:** add the server and sign in:
 
 ```bash
-codex mcp add clifton --url https://ai.cliftonapi.com/v1/mcp
+codex mcp add clifton --url https://ai.cliftonapi.com/v2/mcp
 codex mcp login clifton
 ```
 
@@ -105,9 +105,33 @@ Start a new chat and ask:
 
 > Use Clifton to find NVIDIA's most recent reported quarterly revenue and cite the source.
 
-Check that the app actually calls **`clifton_ask`** and returns a sourced answer. A response that merely lists tool names does not prove the connection works.
+For v2, confirm that **`clifton_ask`** returns server-issued IDs, the host waits `poll_after_seconds`, and **`clifton_get_response`** with those exact IDs eventually returns a completed sourced answer. Stop on failures or action-needed states; do not automatically resubmit an uncertain ask. A receipt, tool-name list, or Connected badge alone does not prove answer delivery. The current v1 plugin returns its answer through `clifton_ask` and does not use v2 polling.
 
-Available tools depend on your account and authentication method. See [API.md](API.md) for research, agent, and Data Vault tools.
+Available tools depend on your account and authentication method. See [API.md](API.md) for research, search/retrieve, and Data Vault tools.
+
+To download a Vault file, ask the app to find it with `clifton_list_vault_files`, then call `clifton_get_vault_file` with its returned `file_id`. The result includes a temporary signed S3 URL. Open that URL or let the app fetch it; a returned URL alone does not mean the app has saved the file. [Vault reference](API.md#clifton_get_vault_file-read-only).
+
+## Check direct public data
+
+With an eligible organization account, explicitly ask for raw records to use
+`clifton_search`, or for ranked documents to use `clifton_retrieve`. Keep
+ordinary research questions on `clifton_ask`. Refresh the connection's tool
+list if a newly enabled tool is missing; availability depends on the server's
+rollout and account access.
+
+For either direct tool, first call with `{"request_json":"{}"}`. Use a scope
+returned by the endpoint in a scope-only request to discover its schemas,
+then apply the selected tool's `request_json` instructions to build its query.
+Confirm the complete body, native
+status and discovery flag. `422` with `discovery:true` is schema education;
+query data requires 2xx and no discovery flag. Tool names or final prose alone
+do not prove a successful read.
+
+Large successful output may appear in a complete host file. Read that file
+instead of accepting a clipped preview; if unavailable, request a smaller page
+using the returned schema's controls. The 1 MiB server response limit does not
+override smaller host limits. A complete client log does not prove the model
+received the complete body. [Direct data reference](API.md#direct-public-data).
 
 ## Manage access and get help
 

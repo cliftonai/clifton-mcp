@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "clifton-mcp",
   "displayName": "Clifton MCP",
-  "version": "0.1.2",
-  "description": "Source-linked financial research and standing market-monitor agents over MCP — SEC filings, transcripts, expectations, market reactions, and recurring alerts.",
+  "version": "0.1.3",
+  "description": "Source-linked financial research and authorized Data Vault file discovery over the live Clifton MCP connection.",
   "author": {
     "name": "Clifton Software, Inc.",
     "email": "support@cliftonai.com",
@@ -12,6 +12,13 @@
   "homepage": "https://github.com/cliftonai/clifton-mcp",
   "repository": "https://github.com/cliftonai/clifton-mcp",
   "license": "MIT",
-  "keywords": ["mcp", "finance", "sec-filings", "earnings", "claude", "research"],
+  "keywords": [
+    "mcp",
+    "finance",
+    "sec-filings",
+    "earnings",
+    "claude",
+    "research"
+  ],
   "mcpServers": "./.mcp.json"
 }
