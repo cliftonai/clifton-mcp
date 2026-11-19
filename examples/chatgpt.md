@@ -1,5 +1,7 @@
 # ChatGPT Web — preview connection settings
 
+**V2 PREVIEW ONLY:** do not apply this v2 configuration before live cutover. For current access use [the live v1 connection](../LIVE.md). Host acceptance remains pending unless explicitly recorded.
+
 V2 host acceptance is pending. Follow the current [OpenAI connection guide](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) and your workspace policy. In the current Plugins flow, use **+ → Add custom MCP server**; enabling Developer Mode first is not required.
 
 - **Name:** `Clifton`

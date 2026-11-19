@@ -1,16 +1,18 @@
 # Troubleshooting
 
+For current live access use [the v1 connection guide](LIVE.md). V2-specific guidance below applies only after live cutover or against an explicitly identified test endpoint.
+
 Checks for common MCP setup failures. For protocol-level errors, see the **Troubleshooting** table in [API.md](API.md).
 
 ## Quick answers
 
 ### "Couldn't register with the sign-in service"
 
-The OAuth sign-in handshake between the host and Clifton didn't complete. Confirm the connector URL is exactly `https://ai.cliftonapi.com/v2/mcp` and retry — this is sometimes transient. If it persists, it's more likely a Clifton-side issue than your setup: contact [support](SUPPORT.md) with the host you're using and the reference id shown in the error (e.g. `ofid_…`).
+The OAuth sign-in handshake between the host and Clifton didn't complete. Confirm that the connector URL matches your intended endpoint: current live `https://ai.cliftonapi.com/v1/mcp`, or `/v2/mcp` only after cutover. Authenticate again — this is sometimes transient. If it persists, it's more likely a Clifton-side issue than your setup: contact [support](SUPPORT.md) with the host you're using and the reference id shown in the error (e.g. `ofid_…`).
 
 ### OAuth sign-in does not complete
 
-Confirm the server URL is `https://ai.cliftonapi.com/v2/mcp`, then disconnect Clifton and reconnect. Complete sign-in in the browser and return to your app.
+Keep the current live server URL `https://ai.cliftonapi.com/v1/mcp`; use `/v2/mcp` only after the announced cutover. Reauthenticate the intended existing connection. Complete sign-in in the browser and return to your app.
 
 For Claude Code, use `/mcp` to authenticate. For Codex CLI, run `codex mcp login clifton`. If the error persists, contact [support](SUPPORT.md) with your app name and the error text. Do not send credentials or the full sign-in URL.
 
@@ -18,7 +20,13 @@ For Claude Code, use `/mcp` to authenticate. For Codex CLI, run `codex mcp login
 
 The API key is invalid, or the OAuth session expired. Create a new key in the [Clifton console](https://console.cliftonapi.com), or re-authenticate through the host's MCP connection flow.
 
+### V1 ask times out
+
+A v1 `clifton_ask_timeout` means no answer arrived within that client request budget. Open the returned Clifton console link to continue, or narrow the question. Do not switch to unreleased v2 as a timeout workaround.
+
 ### The connection says an upgrade is required
+
+This section applies after the live v2 cutover, not to the current v1 plugin.
 
 Change its URL from `/v1/mcp` to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh its tools. Plugin users should update `clifton-mcp` and restart or reconnect it. Do not add duplicate Clifton connections.
 

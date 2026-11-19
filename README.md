@@ -16,7 +16,11 @@ Clifton exposes MCP tools for markets and finance research, raw structured data 
 
 **Release status:** these docs describe unreleased MCP v2. The existing MCP stays available while v2 is tested separately. Keep your existing connection until all v2 tools are tested and the cutover is approved. [Release notes](CHANGELOG.md#020---unreleased).
 
-## Quick Start
+## Current live access
+
+Use [the live v1 connection guide](LIVE.md) for a new connection today. The plugin below stays on v1.
+
+## V2 preview
 
 `clifton_ask` on MCP v2 acknowledges a saved research request before its answer is ready. Your app waits `poll_after_seconds` (currently ten seconds), then uses `clifton_get_response` to read the current saved state. Each read returns as soon as storage completes; while running, your app waits again before its next read. This requires the app's own timing facility; hosts without one remain unvalidated for this flow. After the approved cutover, update existing connections to `/v2/mcp` and reconnect. [Upgrade and protocol details](API.md).
 
@@ -24,7 +28,7 @@ Clifton exposes MCP tools for markets and finance research, raw structured data 
 
 ### V2 host setup — validation pending
 
-The browser/Desktop flows below have not passed v2 host acceptance; these are preview setup notes, not a supported-host claim. Do not replace an existing live connection. In Claude Desktop or Web, add a custom connector. Use ChatGPT Web's custom-plugin setup where your account permits it; ChatGPT Desktop has not been verified. Use this server URL:
+The browser/Desktop flows below have not passed v2 host acceptance; these are preview setup notes, not a supported-host claim. Do not replace an existing live connection. In Claude Desktop or Web, add a custom connector. Use ChatGPT Web's custom-plugin setup where your account permits it; ChatGPT Desktop has not been verified. After the announced live cutover, use this server URL:
 
 ```text
 https://ai.cliftonapi.com/v2/mcp

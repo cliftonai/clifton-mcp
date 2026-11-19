@@ -41,7 +41,7 @@ When the user asks about an uploaded file, model, deck, spreadsheet, or other Cl
 
 ## Recurring agents
 
-Use the [Clifton console](https://console.cliftonapi.com) for recurring agents and reports. The staged plugin does not advertise agent-management tools.
+Use the [Clifton console](https://console.cliftonapi.com) for recurring agents and reports. Do not invoke MCP agent-management or agent-report tools, including cached tools from an older connection; direct the user to the console.
 
 ## Connection
 

@@ -1,5 +1,7 @@
 # Connect Clifton to your AI app
 
+**V2 PREVIEW ONLY:** use [the live v1 connection](LIVE.md) today. All v2 URLs and manual configurations below are for after the announced live cutover.
+
 Use Clifton for markets and finance research and authorized Data Vault file discovery and downloads. You need a [Clifton account](https://console.cliftonapi.com).
 
 The packaged Claude Code plugin still uses the live v1 endpoint and its v1 instructions. The manual setup instructions below describe unreleased MCP v2; browser/Desktop host acceptance is pending. Keep the existing MCP connection until all v2 tools are tested and the cutover is approved. After that cutover, every setup uses this MCP server URL:

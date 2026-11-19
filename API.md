@@ -1,5 +1,7 @@
 # Clifton MCP — Developer Reference
 
+**V2 PREVIEW ONLY:** use [the live v1 connection](LIVE.md) today. All v2 URLs and manual configurations below are for after the announced live cutover.
+
 Technical reference for connecting an MCP host to Clifton. Use this for Claude Code, Claude Desktop, Claude Web, Codex, Cursor, ChatGPT, or a custom MCP client.
 
 > Looking for end-user setup ("paste this URL into Claude")? See [INSTALL.md](INSTALL.md).
