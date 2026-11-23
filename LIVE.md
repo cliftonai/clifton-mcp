@@ -19,6 +19,6 @@ Use `/mcp` to sign in. Ask a finance question and confirm that `clifton_ask` ret
 
 ## Upgrading from v1
 
-The v1 endpoint is retired and only returns an upgrade notice. Change an existing connection's URL to `/v2/mcp`, then reconnect and refresh its tools. Plugin users update `clifton-mcp` to 0.2.0 and restart or reconnect. Do not add a second Clifton connection.
+The v1 endpoint is retired and only returns an upgrade notice. Change an existing connection's URL to `/v2/mcp`, then reconnect and refresh its tools. Plugin users update `clifton-mcp` to 0.2.1 or later and restart or reconnect. Do not add a second Clifton connection.
 
 Agent tools are not available in v2. Use the [Clifton console](https://console.cliftonapi.com) for recurring agents and reports.

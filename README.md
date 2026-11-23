@@ -17,7 +17,7 @@ Clifton exposes MCP tools for markets and finance research, raw structured data 
 MCP v2 is live and `/v1/mcp` is retired. The old endpoint now only returns an upgrade notice; it runs no tools.
 
 - **Manual connections:** change the URL from `/v1/mcp` to `/v2/mcp`, reconnect, and refresh the tool list.
-- **Claude Code plugin:** update `clifton-mcp` to 0.2.0, then restart Claude Code or reconnect with `/mcp`.
+- **Claude Code plugin:** update `clifton-mcp` to 0.2.1 or later, then restart Claude Code or reconnect with `/mcp`.
 - Do not add a second Clifton connection. Agent tools are gone in v2; existing agents and reports remain in the [Clifton console](https://console.cliftonapi.com).
 
 [Release notes](CHANGELOG.md#020---2026-11-19).
@@ -26,7 +26,7 @@ MCP v2 is live and `/v1/mcp` is retired. The old endpoint now only returns an up
 
 `clifton_ask` acknowledges a saved research request before its answer is ready. Your app waits `poll_after_seconds` (currently ten seconds), then uses `clifton_get_response` to read the current saved state. Each read returns as soon as storage completes; while running, your app waits again before its next read. This requires the app's own timing facility; hosts without one remain unvalidated for this flow. [Protocol details](API.md).
 
-`model` defaults to `instant`. Production currently serves Instant only; Deep Thinking will appear in `tools/list` when it is enabled for MCP. `effort` selects `extra_low`, `low`, `medium` (the default), `high`, or `extra_high`. MCP does not offer `ultra`. Saved responses report both choices; resuming the same message requires that saved pair and the returned IDs. [Model, effort, and continuation details](API.md#clifton_ask-starts-one-answer).
+`model` defaults to `instant`. Deep Thinking requires OAuth and appears in `tools/list` when it is enabled for your account. `effort` selects `extra_low`, `low`, `medium` (the default), `high`, or `extra_high`. MCP does not offer `ultra`. Saved responses report both choices; resuming the same message requires that saved pair and the returned IDs. [Model, effort, and continuation details](API.md#clifton_ask-starts-one-answer).
 
 ## Connect
 

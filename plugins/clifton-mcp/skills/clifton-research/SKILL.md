@@ -62,7 +62,7 @@ When the user wants Clifton to analyze a local file that is not in Vault, upload
 
 1. Call it with `filename` and the exact `file_size` in bytes. Use `storage_class: "DURABLE"` only when the user wants to keep the file; the default expires after 24 hours.
 2. PUT the exact raw bytes to the returned `upload_url` with the returned `Content-Type` and `Content-Length` headers, for example `curl -X PUT -H "Content-Type: <type>" -H "Content-Length: <length>" --data-binary @file "<upload_url>"`. No multipart or chunked transfer.
-3. Call it again with only the returned `file_id` to finalize. Use the file only once the status is `ready`.
+3. Call it again with the returned `file_id` to finalize, plus the same `owner_email` if you supplied one at start. Do not resend the other start fields. Use the file only once the status is `ready`.
 
 Then pass the returned `attachment_ids` to `clifton_ask` with `model: "deep-thinking"`. If finalize returns `upload_not_uploaded`, PUT the bytes and finalize again; on `upload_expired`, start over.
 
@@ -74,4 +74,4 @@ MCP v2 has no agent tools. Use the [Clifton console](https://console.cliftonapi.
 
 ## Connection
 
-The `clifton` MCP server connects over OAuth on first use. No API key is required for the plugin path. If a tool call reports that the server is not connected, tell the user to run `/mcp` and complete Clifton sign-in. If a tool reports `mcp_upgrade_required`, the connection still points at the retired v1 endpoint: tell the user to update the `clifton-mcp` plugin to 0.2.0 and restart or reconnect.
+The `clifton` MCP server connects over OAuth on first use. No API key is required for the plugin path. If a tool call reports that the server is not connected, tell the user to run `/mcp` and complete Clifton sign-in. If a tool reports `mcp_upgrade_required`, the connection still points at the retired v1 endpoint: tell the user to update the `clifton-mcp` plugin to 0.2.1 or later and restart or reconnect.

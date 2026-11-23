@@ -20,7 +20,7 @@ The API key is invalid, or the OAuth session expired. Create a new key in the [C
 
 ### The connection says an upgrade is required
 
-The connection still points at the retired `/v1/mcp` endpoint, which now only returns `mcp_upgrade_required` and runs no tools. Change its URL to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh its tools. Plugin users should update `clifton-mcp` to 0.2.0 and restart or reconnect it. Do not add duplicate Clifton connections.
+The connection still points at the retired `/v1/mcp` endpoint, which now only returns `mcp_upgrade_required` and runs no tools. Change its URL to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh its tools. Plugin users should update `clifton-mcp` to 0.2.1 or later and restart or reconnect it. Do not add duplicate Clifton connections.
 
 ### The request says it is running
 

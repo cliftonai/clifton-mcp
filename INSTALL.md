@@ -8,7 +8,7 @@ Every setup uses this MCP server URL:
 https://ai.cliftonapi.com/v2/mcp
 ```
 
-**Upgrading from v1:** `/v1/mcp` is retired and only returns an upgrade notice. Change the existing connection's URL from `/v1/mcp` to `/v2/mcp`, then reconnect and refresh its tools. For the Claude Code plugin, update `clifton-mcp` to 0.2.0 and restart or reconnect it. Do not add a second Clifton connection. V2 supports research, search/retrieve, and Vault listing, downloads, and uploads; agent tools are unavailable in v2.
+**Upgrading from v1:** `/v1/mcp` is retired and only returns an upgrade notice. Change the existing connection's URL from `/v1/mcp` to `/v2/mcp`, then reconnect and refresh its tools. For the Claude Code plugin, update `clifton-mcp` to 0.2.1 or later and restart or reconnect it. Do not add a second Clifton connection. V2 supports research, search/retrieve, and Vault listing, downloads, and uploads; agent tools are unavailable in v2.
 
 **Testing status:** Claude Code over OAuth has been tested end to end on v2. The other setups below, including Claude Desktop, Claude Web, and ChatGPT Web, are supported but have not been separately acceptance-tested on v2.
 
