@@ -2,6 +2,11 @@
 
 Public changes to the Clifton MCP tool surface.
 
+## [0.2.1] - 2026-11-23
+
+- **Data Vault uploads.** `clifton_upload_vault_file` puts a local file into Data Vault in three steps: start with the filename and exact size, PUT the bytes to the returned signed URL, then finalize. Pass the returned `attachment_ids` to `clifton_ask` with Deep Thinking to analyze the file. Uploads default to 24-hour EPHEMERAL storage; files can be up to 50 MiB. Hosts need HTTP PUT, so Claude Code and Codex can upload while Claude Web and ChatGPT users upload in the Clifton console. See [API.md](API.md#clifton_upload_vault_file-write).
+- **Plugin skill.** `clifton-research` now covers uploading a local file before analysis. Plugin users update `clifton-mcp` to 0.2.1 and reconnect to refresh the tool list.
+
 ## [0.2.0] - 2026-11-19
 
 MCP v2 is live at `https://ai.cliftonapi.com/v2/mcp`, and the packaged plugin now targets it. The v1 endpoint is retired: it returns only an upgrade notice (`mcp_upgrade_required` with an `upgrade_url`) and runs no tools or models.

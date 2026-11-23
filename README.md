@@ -1,11 +1,11 @@
 # <img src="assets/logo-square.png" alt="Clifton" width="32" height="32" align="middle"> Clifton MCP
 
 [![Build](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/cliftonai/clifton-mcp/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.1-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cliftonai/clifton-mcp/pulls)
 
-Clifton exposes MCP tools for markets and finance research, raw structured data and document retrieval, and Data Vault file discovery and downloads. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, news, and attached Clifton Data Vault files, then cites the documents or data it used.
+Clifton exposes MCP tools for markets and finance research, raw structured data and document retrieval, and Data Vault file discovery, downloads, and uploads. `clifton_ask` answers questions about public companies, ETFs, crypto, bonds, options, and macro data from SEC filings, earnings transcripts, analyst expectations, market data, news, and attached Clifton Data Vault files, then cites the documents or data it used.
 
 ![Clifton answering a financial research question in Claude](assets/demo.gif)
 
@@ -53,7 +53,7 @@ On first use, Claude Code connects to Clifton over OAuth. No Client ID is requir
 
 > What was NVDA's most recent reported quarterly revenue?
 
-The plugin adds a [`clifton-research` skill](plugins/clifton-mcp/skills/clifton-research/SKILL.md) that covers asking and polling, direct data, and Vault downloads.
+The plugin adds a [`clifton-research` skill](plugins/clifton-mcp/skills/clifton-research/SKILL.md) that covers asking and polling, direct data, and Vault downloads and uploads.
 
 ### Cursor, Codex, Manual Claude Code
 
@@ -73,6 +73,7 @@ Config snippets live in [`examples/`](examples/).
 - **`clifton_retrieve`** — explicit ranked document retrieval through the public retrieve API.
 - **`clifton_list_vault_files`** — finds authorized Clifton Data Vault files. Use returned file IDs to download a file or pass them to `clifton_ask.attachments` for analysis.
 - **`clifton_get_vault_file`** — returns an authorized signed S3 download URL for one file ID, valid for up to 15 minutes.
+- **`clifton_upload_vault_file`** — uploads a local file to Data Vault in three steps (start, PUT the bytes, finalize) so `clifton_ask` can analyze it. Needs a host that can make HTTP PUT requests, such as Claude Code or Codex.
 
 MCP v2 does not expose agent tools. Manage recurring agents and reports in the [Clifton console](https://console.cliftonapi.com). [Agent-tool availability](AGENT-TOOLS.md).
 

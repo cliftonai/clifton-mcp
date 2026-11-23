@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "clifton-mcp",
   "displayName": "Clifton MCP",
-  "version": "0.2.0",
-  "description": "Source-linked financial research, direct data search and retrieval, and authorized Data Vault file discovery and downloads over Clifton MCP v2.",
+  "version": "0.2.1",
+  "description": "Source-linked financial research, direct data search and retrieval, and authorized Data Vault file discovery, downloads, and uploads over Clifton MCP v2.",
   "author": {
     "name": "Clifton Software, Inc.",
     "email": "support@cliftonai.com",

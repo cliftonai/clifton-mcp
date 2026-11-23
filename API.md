@@ -105,7 +105,7 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 
 ## Available tools
 
-V2 serves six tools: `clifton_ask`, `clifton_get_response`, `clifton_search`, `clifton_retrieve`, `clifton_list_vault_files`, and `clifton_get_vault_file`. A caller may see fewer because of access or rollout gates. Agent tools are unavailable in v2; use the [Clifton console](https://console.cliftonapi.com) for agents and reports.
+V2 serves seven tools: `clifton_ask`, `clifton_get_response`, `clifton_search`, `clifton_retrieve`, `clifton_list_vault_files`, `clifton_get_vault_file`, and `clifton_upload_vault_file`. A caller may see fewer because of access or rollout gates. Agent tools are unavailable in v2; use the [Clifton console](https://console.cliftonapi.com) for agents and reports.
 
 ### `clifton_ask` *(starts one answer)*
 
@@ -120,7 +120,7 @@ Submit a markets or finance question. Clifton saves the turn before returning it
 | `message_id` | string | resume only | Exact returned message ID when answering `needs_input` or resuming `paused`. Omit for an ordinary new follow-up. |
 | `response_format` | object | no | Feature-gated JSON Schema envelope. Resend on a continuation that requires structured output. |
 | `data_sources` | string[] | no | Selected sources. |
-| `attachments` | string[] | no | Authorized Clifton Data Vault file IDs found with `clifton_list_vault_files`. |
+| `attachments` | string[] | no | Authorized Clifton Data Vault file IDs found with `clifton_list_vault_files` or returned by your own finalized `clifton_upload_vault_file` uploads. Requires `model: "deep-thinking"`. |
 | `context` | object | no | Host context; never identity or authority. |
 
 Model and effort are independent: Instant with `extra_high` remains Instant; Deep Thinking with `extra_low` remains Deep Thinking. Both fields are optional strings, not nullable. Omitting either applies its default anew, rather than inheriting a previous turn's choice. Use the exact wire spellings above: `model: "research"`, the old `effort: "instant"` or `effort: "research"`, and spaced or provider-specific effort names are not accepted by v2. Refresh discovery when upgrading from v1.
@@ -238,9 +238,9 @@ existing admission and debits its actual provider cost once.
 
 ### Data Vault access
 
-Both Vault tools accept OAuth and API keys and share the existing Vault feature gate (`mcp_list_vault_files`). Environment rollout can enable either tool independently. Existing admission requires a positive organization credit balance and applies rate limits, even though the tools have no per-call unit charge.
+All three Vault tools accept OAuth and API keys. Listing and download share the existing Vault feature gate (`mcp_list_vault_files`); upload uses `mcp_vault_upload`. Environment rollout can enable each tool independently. Existing admission requires a positive organization credit balance and applies rate limits, even though the tools have no per-call unit charge.
 
-OAuth callers default to the signed-in user. An explicit `owner_email` for another owner requires `vault:delegate`; ordinary organization-manager status or workflow delegation does not grant it. API-key callers must supply `owner_email`; without `vault:delegate` it must name an authorized organization manager. Vault delegation permits another selected owner within the authenticated organization. Neither tool accepts an organization override.
+OAuth callers default to the signed-in user. An explicit `owner_email` for another owner requires `vault:delegate`; ordinary organization-manager status or workflow delegation does not grant it. API-key callers must supply `owner_email`; without `vault:delegate` it must name an authorized organization manager. Vault delegation permits another selected owner within the authenticated organization. No Vault tool accepts an organization override.
 
 Private downloads stay within the authenticated organization, including for administrators and Vault delegates. Authorized owner selection permits another owner's files inside that organization; it does not bypass the organization check. Existing direct-ID access to `GLOBAL` files in `READY` state remains available across organizations. The separate REST Vault API keeps its existing administrator behavior.
 
@@ -300,6 +300,49 @@ Download promptly with an HTTPS GET to `download_url`; S3 needs no Clifton beare
 Signed URLs are transferable bearer links, valid for up to 15 minutes and sometimes less. Access is checked when the URL is issued; an issued link may remain usable until expiry after access changes. Call the tool again for a fresh authorized URL. Keep `file_id` as the lasting reference rather than saving the signed URL as a permanent citation. Private Vault downloads do not use public short URLs.
 
 A missing, expired, non-ready, or inaccessible file produces the same `vault_file_unavailable` refusal with `isError:true` and no download URL. Owner, schema, gate, credit, and rate-limit failures remain their existing MCP refusals. Database or S3 failures remain service failures rather than being reported as a missing file. Check the MCP result, not HTTP success alone.
+
+### `clifton_upload_vault_file` *(write)*
+
+Put a local file into Clifton Data Vault so `clifton_ask` can analyze it. Files already in Vault need no upload; find them with `clifton_list_vault_files`. Upload needs a host that can make an HTTP PUT request, such as Claude Code or Codex through its shell. Hosts without HTTP PUT, including Claude Web and ChatGPT, should ask the user to upload the file in the [Clifton console](https://console.cliftonapi.com).
+
+Upload takes three steps.
+
+**1. Start.** Call the tool without `file_id`.
+
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `filename` | string | yes | Original filename with a supported extension. |
+| `file_size` | integer | yes | Exact size in bytes; at most 50 MiB (52,428,800 bytes). |
+| `content_type` | string | no | Defaults to the MIME type for the filename extension. |
+| `storage_class` | `EPHEMERAL` \| `DURABLE` | no | Defaults to `EPHEMERAL`, which expires after 24 hours. Use `DURABLE` to keep the file. |
+| `folder_path` | string | no | Vault folder. Defaults to `/`. |
+| `owner_email` | string | API-key calls | Authorized owner selector, subject to the Vault access rules above. OAuth defaults to the signed-in user. |
+
+The result contains `file_id`, `upload_url`, `method: "PUT"`, `headers` (`Content-Type` and `Content-Length`), `expires_in: 900`, and `next`.
+
+**2. PUT the bytes.** Send the exact raw file bytes to `upload_url` with the returned headers within 15 minutes. Do not use multipart or chunked transfer; a wrong length fails the signed upload. S3 needs no Clifton bearer token or API-key header.
+
+```sh
+curl -X PUT -H "Content-Type: <returned type>" -H "Content-Length: <returned length>" --data-binary @file "<upload_url>"
+```
+
+**3. Finalize.** After the PUT succeeds, call the tool again with only `file_id`, plus the same `owner_email` if you supplied one. Finalizing checks the file contents whatever Content-Type was declared and returns `file_id`, `filename`, `status: "ready"`, and `attachment_ids`. The file is usable only once it is ready. Calling finalize again for the same ready file is safe.
+
+Pass the returned `attachment_ids` to `clifton_ask.attachments` with `model: "deep-thinking"`; Instant does not read files. Only your own uploads can be attached. A delegated upload belongs to the selected owner and cannot be attached to the caller's `clifton_ask`.
+
+Errors set `isError:true`; read the code from the first JSON text content block.
+
+| Code | Meaning | What to do |
+| --- | --- | --- |
+| `upload_not_uploaded` | Finalize was called before the bytes arrived. | PUT the bytes, then finalize again before the URL expires. |
+| `upload_expired` | The upload URL expired unused. | Start again without `file_id`. Bytes uploaded before expiry can still be finalized. |
+| `upload_size_mismatch` | The uploaded bytes do not match `file_size`. | Start again with the exact size. |
+| `upload_not_found` | The `file_id` is unknown, belongs to someone else, or is in an unusable state. | Start again. |
+| `invalid_file` | Unsupported extension or contents, or the file contains macros. | Upload a supported file. |
+| `upload_rejected` | Another upload refusal. | Report it to the user. |
+| `vault_storage_limit_exceeded` | The owner's Vault storage limit is reached. | Delete unneeded Vault files, then start again. |
+
+Upload has its own organization feature gate (`mcp_vault_upload`), separate from the listing and download gate. Like the other Vault tools, it requires a positive organization credit balance and applies rate limits.
 
 ---
 

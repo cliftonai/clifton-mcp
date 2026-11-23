@@ -1,6 +1,6 @@
 # Connect Clifton to your AI app
 
-Use Clifton for markets and finance research and authorized Data Vault file discovery and downloads. You need a [Clifton account](https://console.cliftonapi.com).
+Use Clifton for markets and finance research and authorized Data Vault file discovery, downloads, and uploads. You need a [Clifton account](https://console.cliftonapi.com).
 
 Every setup uses this MCP server URL:
 
@@ -8,7 +8,7 @@ Every setup uses this MCP server URL:
 https://ai.cliftonapi.com/v2/mcp
 ```
 
-**Upgrading from v1:** `/v1/mcp` is retired and only returns an upgrade notice. Change the existing connection's URL from `/v1/mcp` to `/v2/mcp`, then reconnect and refresh its tools. For the Claude Code plugin, update `clifton-mcp` to 0.2.0 and restart or reconnect it. Do not add a second Clifton connection. V2 supports research, search/retrieve, and Vault listing/downloads; agent tools are unavailable in v2.
+**Upgrading from v1:** `/v1/mcp` is retired and only returns an upgrade notice. Change the existing connection's URL from `/v1/mcp` to `/v2/mcp`, then reconnect and refresh its tools. For the Claude Code plugin, update `clifton-mcp` to 0.2.0 and restart or reconnect it. Do not add a second Clifton connection. V2 supports research, search/retrieve, and Vault listing, downloads, and uploads; agent tools are unavailable in v2.
 
 **Testing status:** Claude Code over OAuth has been tested end to end on v2. The other setups below, including Claude Desktop, Claude Web, and ChatGPT Web, are supported but have not been separately acceptance-tested on v2.
 
@@ -106,6 +106,8 @@ Confirm that **`clifton_ask`** returns server-issued IDs, the host waits `poll_a
 Available tools depend on your account and authentication method. See [API.md](API.md) for research, search/retrieve, and Data Vault tools.
 
 To download a Vault file, ask the app to find it with `clifton_list_vault_files`, then call `clifton_get_vault_file` with its returned `file_id`. The result includes a temporary signed S3 URL. Open that URL or let the app fetch it; a returned URL alone does not mean the app has saved the file. [Vault reference](API.md#clifton_get_vault_file-read-only).
+
+To analyze a local file, a host that can make HTTP PUT requests (Claude Code or Codex) can upload it with `clifton_upload_vault_file`: start, PUT the bytes, then finalize, and pass the returned ID to `clifton_ask.attachments` with Deep Thinking. In Claude Web, Claude Desktop, or ChatGPT, upload the file in the [Clifton console](https://console.cliftonapi.com) instead. [Upload reference](API.md#clifton_upload_vault_file-write).
 
 ## Check direct public data
 
