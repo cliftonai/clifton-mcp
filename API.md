@@ -10,7 +10,7 @@ Technical reference for connecting an MCP host to Clifton. Use this for Claude C
 
 `https://ai.cliftonapi.com/v2/mcp`
 
-This is the live MCP v2 endpoint. The former `/v1/mcp` endpoint is retired: `initialize` reports the server as `Clifton (upgrade required)` with instructions to switch to `/v2/mcp`, and every tool call returns `mcp_upgrade_required` with an `upgrade_url`. It runs no tools or models. To upgrade, change the connection URL to `/v2/mcp`, reconnect, and refresh tools; plugin users update `clifton-mcp` to 0.2.0. See the [release notes](CHANGELOG.md#020---2026-11-19).
+This is the live MCP v2 endpoint. The former `/v1/mcp` endpoint is retired: `initialize` reports the server as `Clifton (upgrade required)` with instructions to switch to `/v2/mcp`, and every tool call returns `mcp_upgrade_required` with an `upgrade_url`. It runs no tools or models. To upgrade, change the connection URL to `/v2/mcp`, reconnect, and refresh tools; plugin users update `clifton-mcp` to 0.2.1 or later. See the [release notes](CHANGELOG.md#020---2026-11-19).
 
 - **Transport:** Streamable HTTP (MCP `2025-06-18`; `2025-03-26` accepted for client back-compat).
 - **Protocol:** JSON-RPC 2.0 single-request per POST. Batch arrays are **not** supported.
@@ -105,7 +105,7 @@ http_headers = { "X-API-Key" = "paste-your-key-here" }
 
 ## Available tools
 
-V2 serves six tools: `clifton_ask`, `clifton_get_response`, `clifton_search`, `clifton_retrieve`, `clifton_list_vault_files`, and `clifton_get_vault_file`. A caller may see fewer because of access or rollout gates. Agent tools are unavailable in v2; use the [Clifton console](https://console.cliftonapi.com) for agents and reports.
+V2 serves seven tools: `clifton_ask`, `clifton_get_response`, `clifton_search`, `clifton_retrieve`, `clifton_list_vault_files`, `clifton_get_vault_file`, and `clifton_upload_vault_file`. A caller may see fewer because of access or rollout gates. Agent tools are unavailable in v2; use the [Clifton console](https://console.cliftonapi.com) for agents and reports.
 
 ### `clifton_ask` *(starts one answer)*
 
@@ -114,13 +114,13 @@ Submit a markets or finance question. Clifton saves the turn before returning it
 | Input | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `message` | string | yes | Question or task. |
-| `model` | `instant` or `deep-thinking` | no | Defaults to `instant`. Production currently offers `instant` only; `deep-thinking` appears in `tools/list` when it is enabled. Deep Thinking requires OAuth and server activation for the caller. API-key callers are Instant-only. |
+| `model` | `instant` or `deep-thinking` | no | Defaults to `instant`. `deep-thinking` appears in `tools/list` when it is enabled for the caller. Deep Thinking requires OAuth and organization eligibility. API-key callers are Instant-only. |
 | `effort` | `extra_low`, `low`, `medium`, `high`, or `extra_high` | no | Defaults to `medium`. MCP does not offer `ultra`. Each depth applies within each permitted model. |
 | `session_id` | string | no | Exact returned session ID for a follow-up; omit on the first call. |
 | `message_id` | string | resume only | Exact returned message ID when answering `needs_input` or resuming `paused`. Omit for an ordinary new follow-up. |
 | `response_format` | object | no | Feature-gated JSON Schema envelope. Resend on a continuation that requires structured output. |
 | `data_sources` | string[] | no | Selected sources. |
-| `attachments` | string[] | no | Authorized Clifton Data Vault file IDs found with `clifton_list_vault_files`. |
+| `attachments` | string[] | no | Authorized Clifton Data Vault file IDs found with `clifton_list_vault_files` or returned by your own finalized `clifton_upload_vault_file` uploads. Requires `model: "deep-thinking"`. |
 | `context` | object | no | Host context; never identity or authority. |
 
 Model and effort are independent: Instant with `extra_high` remains Instant; Deep Thinking with `extra_low` remains Deep Thinking. Both fields are optional strings, not nullable. Omitting either applies its default anew, rather than inheriting a previous turn's choice. Use the exact wire spellings above: `model: "research"`, the old `effort: "instant"` or `effort: "research"`, and spaced or provider-specific effort names are not accepted by v2. Refresh discovery when upgrading from v1.
@@ -238,9 +238,9 @@ existing admission and debits its actual provider cost once.
 
 ### Data Vault access
 
-Both Vault tools accept OAuth and API keys and share the existing Vault feature gate (`mcp_list_vault_files`). Environment rollout can enable either tool independently. Existing admission requires a positive organization credit balance and applies rate limits, even though the tools have no per-call unit charge.
+All three Vault tools accept OAuth and API keys. Listing and download share the existing Vault feature gate (`mcp_list_vault_files`); upload uses `mcp_vault_upload`. Environment rollout can enable each tool independently. Existing admission requires a positive organization credit balance and applies rate limits, even though the tools have no per-call unit charge.
 
-OAuth callers default to the signed-in user. An explicit `owner_email` for another owner requires `vault:delegate`; ordinary organization-manager status or workflow delegation does not grant it. API-key callers must supply `owner_email`; without `vault:delegate` it must name an authorized organization manager. Vault delegation permits another selected owner within the authenticated organization. Neither tool accepts an organization override.
+OAuth callers default to the signed-in user. An explicit `owner_email` for another owner requires `vault:delegate`; ordinary organization-manager status or workflow delegation does not grant it. API-key callers must supply `owner_email`; without `vault:delegate` it must name an authorized organization manager. Vault delegation permits another selected owner within the authenticated organization. No Vault tool accepts an organization override.
 
 Private downloads stay within the authenticated organization, including for administrators and Vault delegates. Authorized owner selection permits another owner's files inside that organization; it does not bypass the organization check. Existing direct-ID access to `GLOBAL` files in `READY` state remains available across organizations. The separate REST Vault API keeps its existing administrator behavior.
 
@@ -301,11 +301,54 @@ Signed URLs are transferable bearer links, valid for up to 15 minutes and someti
 
 A missing, expired, non-ready, or inaccessible file produces the same `vault_file_unavailable` refusal with `isError:true` and no download URL. Owner, schema, gate, credit, and rate-limit failures remain their existing MCP refusals. Database or S3 failures remain service failures rather than being reported as a missing file. Check the MCP result, not HTTP success alone.
 
+### `clifton_upload_vault_file` *(write)*
+
+Put a local file into Clifton Data Vault so `clifton_ask` can analyze it. Files already in Vault need no upload; find them with `clifton_list_vault_files`. Upload needs a host that can make an HTTP PUT request, such as Claude Code or Codex through its shell. Hosts without HTTP PUT, including Claude Web and ChatGPT, should ask the user to upload the file in the [Clifton console](https://console.cliftonapi.com).
+
+Upload takes three steps.
+
+**1. Start.** Call the tool without `file_id`.
+
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `filename` | string | yes | Original filename with a supported extension. |
+| `file_size` | integer | yes | Exact size in bytes; at most 50 MiB (52,428,800 bytes). |
+| `content_type` | string | no | Defaults to the MIME type for the filename extension. |
+| `storage_class` | `EPHEMERAL` \| `DURABLE` | no | Defaults to `EPHEMERAL`, which expires after 24 hours and is not indexed for content search; it can still be attached to `clifton_ask`. Use `DURABLE` to keep the file. |
+| `folder_path` | string | no | Vault folder. Defaults to `/`. |
+| `owner_email` | string | API-key calls | Authorized owner selector, subject to the Vault access rules above. OAuth defaults to the signed-in user. |
+
+The result contains `file_id`, `upload_url`, `method: "PUT"`, `headers` (`Content-Type` and `Content-Length`), `expires_in: 900`, and `next`.
+
+**2. PUT the bytes.** Send the exact raw file bytes to `upload_url` with the returned headers within 15 minutes. Do not use multipart or chunked transfer; a wrong length fails the signed upload. S3 needs no Clifton bearer token or API-key header.
+
+```sh
+curl -X PUT -H "Content-Type: <returned type>" -H "Content-Length: <returned length>" --data-binary @file "<upload_url>"
+```
+
+**3. Finalize.** After the PUT succeeds, call the tool again with only `file_id`, plus the same `owner_email` if you supplied one. Finalizing checks the file contents whatever Content-Type was declared and returns `file_id`, `filename`, `status: "ready"`, and `attachment_ids`. The file is usable only once it is ready. Calling finalize again for the same ready file is safe.
+
+Pass the returned `attachment_ids` to `clifton_ask.attachments` with `model: "deep-thinking"`; Instant does not read files. Only your own uploads can be attached. A delegated upload belongs to the selected owner and cannot be attached to the caller's `clifton_ask`.
+
+Errors set `isError:true`; read the code from the first JSON text content block.
+
+| Code | Meaning | What to do |
+| --- | --- | --- |
+| `upload_not_uploaded` | Finalize was called before the bytes arrived. | PUT the bytes, then finalize again before the URL expires. |
+| `upload_expired` | The upload URL expired unused. | Start again without `file_id`. Bytes uploaded before expiry can still be finalized. |
+| `upload_size_mismatch` | The uploaded bytes do not match `file_size`. | Start again with the exact size. |
+| `upload_not_found` | The `file_id` is unknown, belongs to someone else, or is in an unusable state. | Start again. |
+| `invalid_file` | Unsupported extension or contents, or the file contains macros. | Upload a supported file. |
+| `upload_rejected` | Another upload refusal. | Report it to the user. |
+| `vault_storage_limit_exceeded` | The owner's Vault storage limit is reached. | Delete unneeded Vault files, then start again. |
+
+Upload has its own organization feature gate (`mcp_vault_upload`), separate from the listing and download gate. It is available only when the environment explicitly enables it and the organization has that gate; administrator access does not bypass either. Like the other Vault tools, it requires a positive organization credit balance and applies rate limits.
+
 ---
 
 ## Execution and limits
 
-- `model` selects Instant or Deep Thinking; `effort` selects a standard depth within that model. Defaults are Instant/medium. Production currently serves Instant only. Deep Thinking remains OAuth-only and gated; discover the schema and eligibility through authenticated `tools/list`. MCP does not offer `ultra` effort.
+- `model` selects Instant or Deep Thinking; `effort` selects a standard depth within that model. Defaults are Instant/medium. Deep Thinking remains OAuth-only and gated; discover the schema and eligibility through authenticated `tools/list`. MCP does not offer `ultra` effort.
 - MCP does not impose its former short execution cap. MCP Instant uses the selected model maximum when it raises the ordinary default (currently 300 seconds); Deep Thinking retains its configured default (currently 720 seconds). These configured values remain subject to cost, available credit, cumulative message budgets and the Router invocation deadline. Changing effort does not grant a larger time or cost allowance. Other callers' defaults remain unchanged.
 - Acknowledgement and final completion are separate. Losing the host connection after acknowledgement does not itself stop the Router's retained execution.
 - Questions and pauses require action; polling alone cannot finish them. A same-message resume must match the saved model/effort pair and preserves the original message's cumulative budget. Omitted values apply the defaults, not the saved choices.
@@ -320,7 +363,7 @@ A missing, expired, non-ready, or inaccessible file produces the same `vault_fil
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `401 Unauthorized` immediately on any RPC | Missing or wrong `X-API-Key` / `Authorization` header. | Verify the key is current; for OAuth, complete the auth flow before issuing tool calls. |
-| `mcp_upgrade_required` from the old endpoint | The connection uses the retired `/v1/mcp`. | Update it to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh tools. Plugin users update `clifton-mcp` to 0.2.0. |
+| `mcp_upgrade_required` from the old endpoint | The connection uses the retired `/v1/mcp`. | Update it to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh tools. Plugin users update `clifton-mcp` to 0.2.1 or later. |
 | A submission returns `status: running` | The request is accepted and saved. | Wait `poll_after_seconds` seconds, then call `clifton_get_response` using its exact session and message IDs. |
 | Tool not found on `tools/call` (`METHOD_NOT_FOUND`) | Tool not in the currently-enabled set. | Confirm via `tools/list`; only currently-enabled tools respond. |
 | OAuth completes but `tools/call` returns 401 | The access token's identity claim could not be resolved. | Re-run sign-in; if persistent, contact support with the trace details. |

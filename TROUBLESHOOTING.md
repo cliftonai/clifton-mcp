@@ -20,7 +20,7 @@ The API key is invalid, or the OAuth session expired. Create a new key in the [C
 
 ### The connection says an upgrade is required
 
-The connection still points at the retired `/v1/mcp` endpoint, which now only returns `mcp_upgrade_required` and runs no tools. Change its URL to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh its tools. Plugin users should update `clifton-mcp` to 0.2.0 and restart or reconnect it. Do not add duplicate Clifton connections.
+The connection still points at the retired `/v1/mcp` endpoint, which now only returns `mcp_upgrade_required` and runs no tools. Change its URL to `https://ai.cliftonapi.com/v2/mcp`, then reconnect and refresh its tools. Plugin users should update `clifton-mcp` to 0.2.1 or later and restart or reconnect it. Do not add duplicate Clifton connections.
 
 ### The request says it is running
 
@@ -30,7 +30,7 @@ If the initial acknowledgement itself was lost, do not automatically submit the 
 
 ### Your host shows fewer or older Clifton tools than expected, or rejects a tool argument
 
-Your host cached an older copy of Clifton's tool list, or the tool is not enabled for your account. After upgrading to v2, a stale cache may omit `clifton_get_vault_file` or still offer removed agent tools. V2 has six tools: ask, get response, search, retrieve, list Vault files, and get Vault file. **Reconnect Clifton to refresh the tool list:**
+Your host cached an older copy of Clifton's tool list, or the tool is not enabled for your account. After upgrading to v2, a stale cache may omit `clifton_get_vault_file` or still offer removed agent tools. V2 has seven tools: ask, get response, search, retrieve, list Vault files, get Vault file, and upload Vault file. **Reconnect Clifton to refresh the tool list:**
 
 - **Claude Code:** run `/mcp`, reconnect Clifton — or restart Claude Code. (Plugin install: `/plugin uninstall clifton-mcp@clifton-mcp` then re-install also forces a clean fetch.)
 - **Claude Web / Desktop:** open **Connectors**, toggle Clifton **off and on** (or remove and re-add it). Restarting the app alone is **not** enough — the tool list is tied to the connector, not the app session.

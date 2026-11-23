@@ -1,6 +1,6 @@
 ---
 name: clifton-research
-description: Use Clifton for markets and finance questions about stocks, ETFs, crypto, bonds, options, macro data, SEC filings, earnings, transcripts, analyst ratings, screening, company comparisons, raw financial data, and uploaded Clifton Data Vault files. Also use for Clifton agent or report requests to direct the user to the console. Calls clifton_ask, clifton_get_response, clifton_search, clifton_retrieve, clifton_list_vault_files, and clifton_get_vault_file on the bundled clifton MCP server.
+description: Use Clifton for markets and finance questions about stocks, ETFs, crypto, bonds, options, macro data, SEC filings, earnings, transcripts, analyst ratings, screening, company comparisons, raw financial data, and uploaded Clifton Data Vault files. Also use for Clifton agent or report requests to direct the user to the console. Calls clifton_ask, clifton_get_response, clifton_search, clifton_retrieve, clifton_list_vault_files, clifton_get_vault_file, and clifton_upload_vault_file on the bundled clifton MCP server.
 ---
 
 # Clifton Research & Data Vault
@@ -56,9 +56,17 @@ When the user explicitly wants raw structured records, use `clifton_search`; for
 When the user asks about an uploaded file, model, deck, spreadsheet, or other Clifton Data Vault item, call `clifton_list_vault_files` first to find accessible file IDs. Then either:
 
 - **Download:** call `clifton_get_vault_file` with the `file_id`. It returns a signed download URL valid for about 15 minutes; request a fresh one if it expires. Do not claim the file was saved unless you fetched it.
-- **Analyze:** call `clifton_ask` with the IDs in `attachments`.
+- **Analyze:** call `clifton_ask` with the IDs in `attachments` and `model: "deep-thinking"`.
 
-Do not claim a host-side file is attached unless it already exists in Clifton Data Vault or the user uploads it there first.
+When the user wants Clifton to analyze a local file that is not in Vault, upload it with `clifton_upload_vault_file`:
+
+1. Call it with `filename` and the exact `file_size` in bytes. Use `storage_class: "DURABLE"` only when the user wants to keep the file; the default expires after 24 hours.
+2. PUT the exact raw bytes to the returned `upload_url` with the returned `Content-Type` and `Content-Length` headers, for example `curl -X PUT -H "Content-Type: <type>" -H "Content-Length: <length>" --data-binary @file "<upload_url>"`. No multipart or chunked transfer.
+3. Call it again with the returned `file_id` to finalize, plus the same `owner_email` if you supplied one at start. Do not resend the other start fields. Use the file only once the status is `ready`.
+
+Then pass the returned `attachment_ids` to `clifton_ask` with `model: "deep-thinking"`. If finalize returns `upload_not_uploaded`, PUT the bytes and finalize again; on `upload_expired`, start over.
+
+Do not claim a host-side file is attached unless it already exists in Clifton Data Vault or you uploaded and finalized it.
 
 ## Recurring agents
 
@@ -66,4 +74,4 @@ MCP v2 has no agent tools. Use the [Clifton console](https://console.cliftonapi.
 
 ## Connection
 
-The `clifton` MCP server connects over OAuth on first use. No API key is required for the plugin path. If a tool call reports that the server is not connected, tell the user to run `/mcp` and complete Clifton sign-in. If a tool reports `mcp_upgrade_required`, the connection still points at the retired v1 endpoint: tell the user to update the `clifton-mcp` plugin to 0.2.0 and restart or reconnect.
+The `clifton` MCP server connects over OAuth on first use. No API key is required for the plugin path. If a tool call reports that the server is not connected, tell the user to run `/mcp` and complete Clifton sign-in. If a tool reports `mcp_upgrade_required`, the connection still points at the retired v1 endpoint: tell the user to update the `clifton-mcp` plugin to 0.2.1 or later and restart or reconnect.
