@@ -16,7 +16,7 @@ claude mcp add --transport http \
   clifton https://ai.cliftonapi.com/v2/mcp
 ```
 
-Run `/mcp` in Claude Code and select Clifton to sign in. Choose either the plugin or the manual server configuration. Plugin users upgrading from v1 update `clifton-mcp` to 0.2.0 and restart or reconnect.
+Run `/mcp` in Claude Code and select Clifton to sign in. Choose either the plugin or the manual server configuration. Plugin users upgrading from v1 update `clifton-mcp` to 0.2.1 or later and restart or reconnect.
 
 Manual API key — `~/.claude.json`:
 
